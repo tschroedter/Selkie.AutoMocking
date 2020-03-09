@@ -31,6 +31,8 @@ The Calculator will only...
 * adds two integers together and
 * subtracts two integers from each other.
 
+_The complete source code can be found here: [Example](https://github.com/tschroedter/Selkie.AutoMocking/tree/master/src/Example)_
+
 ## Unit testing the Add method
 The example below shows how to test the **Add** method using the 'old' and 'new' way.
 
