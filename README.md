@@ -9,8 +9,8 @@ The Selkie.AutoMocking project is an extension for MSTest2 which provides a [SUT
 <br>
 ```csharp
 [AutoDataTestMethod]
-public void Add_ForNumbers_Adds(Calculator            sut,
-                                [Freeze] IFunctionAdd add)
+public void Add_ForNumbers_Adds(Calculator    sut,
+                                [Freeze] IAdd add)
 {
     add.Execute(1, 2)
        .Returns(3);
@@ -63,8 +63,8 @@ namespace Calculator.Tests
         [TestInitialize]
         public void TestInitialize()
         {
-            _add      = Substitute.For<IFunctionAdd>();
-            _subtract = Substitute.For<IFunctionSubtract>();
+            _add      = Substitute.For<IAdd>();
+            _subtract = Substitute.For<ISubtract>();
         }
 
         private Calculator CreateSut()
@@ -89,8 +89,8 @@ namespace Calculator.Tests
     public class CalculatorTests
     {
         [AutoDataTestMethod]
-        public void Add_ForNumbers_Adds(Calculator            sut,
-                                        [Freeze] IFunctionAdd add)
+        public void Add_ForNumbers_Adds(Calculator    sut,
+                                        [Freeze] IAdd add)
         {
             add.Execute(1, 2)
                .Returns(3);
