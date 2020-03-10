@@ -127,7 +127,7 @@ public class Calculator : ICalculator
 ```
 
 ### How is the unit test class affected?
-**No existing code needs to be modified, only the new test for the subtraction needs to be added!**
+No existing code needs to be modified, only the new test for the subtraction needs to be added!
 
 ```csharp
 [AutoDataTestClass]
