@@ -1,9 +1,9 @@
 ﻿using System;
 using AutoFixture;
+using AutoFixture.Kernel;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AutoFixture.Kernel;
 using NSubstitute;
 using Selkie.AutoMocking.Interfaces;
 using Selkie.AutoMocking.Tests.TestClasses;
@@ -18,6 +18,8 @@ namespace Selkie.AutoMocking.Tests
         private ICustomAttributeData   _freezeAttribute;
         private IParameterInfo         _infoClass;
         private IParameterInfo         _infoInt;
+        private IParameterInfo         _infoLazyClass;
+        private IParameterInfo         _infoLazyString;
         private IParameterInfo         _infoSomething;
         private IParameterInfo         _infoSomethingElseWithFreeze;
         private IParameterInfo         _infoString;
@@ -372,6 +374,76 @@ namespace Selkie.AutoMocking.Tests
             }
         }
 
+        [TestMethod]
+        public void Create_ForLazyStringParameterInfo_Instance()
+        {
+            _infoInt.CustomAttributes.Returns(_customAttributesWithFreeze);
+
+            IParameterInfo[] infos =
+            {
+                _infoLazyString
+            };
+
+            using (new AssertionScope())
+            {
+                var actual = CreateSut()
+                   .Create(infos);
+
+                actual.Length
+                      .Should()
+                      .Be(1);
+
+                var lazy = actual[0] as Lazy<string>;
+
+                lazy.Should()
+                    .NotBeNull();
+
+                lazy?.IsValueCreated
+                     .Should()
+                     .BeFalse();
+
+                lazy?.Value
+                     .Should()
+                     .NotBeNull();
+            }
+        }
+
+        [TestMethod]
+        public void Create_ForLazySomethingParameterInfo_Instance()
+        {
+            _infoInt.CustomAttributes.Returns(_customAttributesWithFreeze);
+
+            IParameterInfo[] infos =
+            {
+                _infoLazyClass
+            };
+
+            using (new AssertionScope())
+            {
+                var sut = CreateSut();
+
+                var actual = sut.Create(infos);
+
+                actual.Length
+                      .Should()
+                      .Be(1);
+
+                var lazy = actual[0] as Lazy<object>;
+
+                lazy.Should()
+                    .NotBeNull();
+
+                lazy?.IsValueCreated
+                     .Should()
+                     .BeFalse();
+
+                var lazyValue = lazy?.Value as Something;
+
+                lazyValue?.Should()
+                          .NotBeNull();
+            }
+        }
+
         [TestInitialize]
         public void TestInitialize()
         {
@@ -386,9 +458,11 @@ namespace Selkie.AutoMocking.Tests
                                           };
 
             _infoInt                     = CreateParameterInfo(typeof(int));
+            _infoLazyString              = CreateParameterInfo(typeof(Lazy<string>));
             _infoString                  = CreateParameterInfo(typeof(string));
             _infoClass                   = CreateParameterInfo(typeof(SomethingElse));
             _infoSut                     = CreateParameterInfo(typeof(Something));
+            _infoLazyClass               = CreateParameterInfo(typeof(Lazy<Something>));
             _infoSomething               = CreateParameterInfo(typeof(ISomething));
             _infoSomethingElseWithFreeze = CreateParameterInfo(typeof(ISomethingElse));
             _infoSomethingElseWithFreeze.CustomAttributes.Returns(_customAttributesWithFreeze);

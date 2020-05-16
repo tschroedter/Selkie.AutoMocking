@@ -92,8 +92,29 @@ namespace Selkie.AutoMocking
 
         private object CreateSutArgument(IParameterInfo info)
         {
+            if (IsLazy(info))
+            {
+                // var lazyType = typeof(Lazy<>).MakeGenericType(info.ParameterType.GenericTypeArguments);
+                // var test = Activator.CreateInstance(lazyType);
+                //
+                // return Activator.CreateInstance(lazyType);
+
+                // only supports the first generic argument, which should be the SUT
+                return new Lazy<object>(() => CreateArgument(info.ParameterType.GenericTypeArguments.First(),
+                                                             IsFreezeParameter(info)));
+            }
+
             return CreateArgument(info.ParameterType,
                                   IsFreezeParameter(info));
+        }
+
+        private static bool IsLazy(IParameterInfo info)
+        {
+            // todo there should be a better way of checking this
+            // info.ParameterType.UnderlyingSystemType == typeof(Lazy<>)
+            return info.ParameterType.IsGenericType                                        &&
+                   !string.IsNullOrEmpty(info.ParameterType.UnderlyingSystemType.FullName) &&
+                   info.ParameterType.UnderlyingSystemType.FullName.StartsWith(typeof(Lazy<>).FullName ?? string.Empty);
         }
     }
 }
