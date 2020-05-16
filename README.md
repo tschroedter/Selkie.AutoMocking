@@ -20,6 +20,8 @@ public void Add_ForNumbers_Adds(Calculator    sut,
        .Be(3);
 }
 ```
+**AutoDataTestMethod?** The attribute tells MSTest to use the Selkie.AutoMocking extension of the DataTestMethod.
+<br>
 **Freeze?** Freezing a parameter makes sure that the SUT uses the same instance ass the frozen parameter (see [AutoFixture Freeze](https://blog.ploeh.dk/2010/03/17/AutoFixtureFreeze/)).
 
 # Example
@@ -27,58 +29,47 @@ public void Add_ForNumbers_Adds(Calculator    sut,
 Let do a very simple Calculator which will show us how to use the Selkie.AutoMocking package.
 <br><br>
 The Calculator will only...
-* work for integers,
-* adds two integers together and
-* subtracts two integers from each other.
+* work for integers and 
+* adds two integers together.
 
 _The complete source code can be found here: [Example](https://github.com/tschroedter/Selkie.AutoMocking/tree/master/src/Example)_
 
-## Unit testing the Add method
-The example below shows how to test the **Add** method using the 'old' and 'new' way.
+### The Calculator Class
+The Calculator class depends on the IAdd interface which is injected in the constructor.
 
-### Old way...
 ```csharp
-using Calculator.Interfaces;
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
-
-namespace Calculator.Tests
+public class Calculator : ICalculator
 {
-    [TestClass]
-    public class OldCalculatorTests
+    private readonly IAdd _add;
+
+    public Calculator([NotNull] IAdd add)
     {
-        private IFunctionAdd      _add;
-        private IFunctionSubtract _subtract;
+        _add = add;
+    }
 
-        [TestMethod]
-        public void Add_ForNumbers_Adds()
-        {
-            _add.Execute(1, 2)
-                .Returns(3);
-
-            CreateSut().Add(1, 2)
-                       .Should()
-                       .Be(3);
-        }
-
-        [TestInitialize]
-        public void TestInitialize()
-        {
-            _add      = Substitute.For<IAdd>();
-            _subtract = Substitute.For<ISubtract>();
-        }
-
-        private Calculator CreateSut()
-        {
-            return new Calculator(_add,
-                                  _subtract);
-        }
+    public int Add(int a, int b)
+    {
+        return _add.Execute(a, b);
     }
 }
 ```
 
-### New way...
+### The Add Class
+The job of the Add class is just to add 2 integers together.
+
+```csharp
+public class Add : IAdd
+{
+    public int Execute(int a, int b)
+    {
+        return a + b;
+    }
+}
+```
+
+### Unit testing the Calculator's Add method
+The example below shows how to test the **Add** method using the AutoDataTestMethod of the Selkie.AutoMocking package.
+
 ```csharp
 using Calculator.Interfaces;
 using FluentAssertions;
@@ -101,6 +92,69 @@ namespace Calculator.Tests
                .Should()
                .Be(3);
         }
+    }
+}
+```
+
+_Note: There isn't a method to initialize the test nor a CreateSut() method!_
+
+## Adding subtraction to the Calculator 
+Now we add the subtraction functionality to the Calculator class by adding a dependency in the constructor.
+
+```csharp
+public class Calculator : ICalculator
+{
+    private readonly IAdd      _add;
+    private readonly ISubtract _subtract;
+
+    public Calculator([NotNull] IAdd      add,
+                      [NotNull] ISubtract subtract)
+    {
+        _add      = add;
+        _subtract = subtract;
+    }
+
+    public int Add(int a, int b)
+    {
+        return _add.Execute(a, b);
+    }
+
+    public int Subtract(int a, int b)
+    {
+        return _subtract.Execute(a, b);
+    }
+}
+```
+
+### How is the unit test class affected?
+No existing code needs to be modified, only the new test for the subtraction needs to be added!
+
+```csharp
+[AutoDataTestClass]
+public class CalculatorTests
+{
+    [AutoDataTestMethod]
+    public void Add_ForNumbers_Adds(Calculator    sut,
+                                    [Freeze] IAdd add)
+    {
+        add.Execute(1, 2)
+           .Returns(3);
+
+        sut.Add(1, 2)
+           .Should()
+           .Be(3);
+    }
+
+    [AutoDataTestMethod]
+    public void Subtract_ForNumbers_Subtracts(Calculator         sut,
+                                              [Freeze] ISubtract subtract)
+    {
+        subtract?.Execute(1, 2)
+                 .Returns(-1);
+
+        sut.Subtract(1, 2)
+           .Should()
+           .Be(-1);
     }
 }
 ```
