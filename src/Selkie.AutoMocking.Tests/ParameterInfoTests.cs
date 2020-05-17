@@ -50,8 +50,7 @@ namespace Selkie.AutoMocking.Tests
 
             action.Should()
                   .Throw<ArgumentNullException>()
-                  .And.ParamName.Should()
-                  .Be("parameterInfo");
+                  .WithParameter("parameterInfo");
         }
 
         [TestInitialize]

@@ -4,7 +4,6 @@ using FluentAssertions;
 using JetBrains.Annotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using Selkie.AutoMocking;
 
 namespace Calculator.Tests
@@ -16,15 +15,14 @@ namespace Calculator.Tests
         private ISubtract _subtract;
 
         [AutoDataTestMethod]
-        public void AConstructor_ForAddIsNull_Throws(Lazy<Calculator> sut,
-                                                     [Freeze] IAdd    add)
+        public void Constructor_ForAddIsNull_Throws(Lazy<Calculator> sut,
+                                                     [BeNull] IAdd    add)
         {
-            add = null;
-
+            // ReSharper disable once UnusedVariable
             Action action = () => { var test = sut.Value; };
 
             action.Should()
-                  .Throws<ArgumentNullException>();
+                  .Throw<ArgumentNullException>();
         }
 
         [AutoDataTestMethod]

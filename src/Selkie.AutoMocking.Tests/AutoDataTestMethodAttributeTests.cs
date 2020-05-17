@@ -34,8 +34,7 @@ namespace Selkie.AutoMocking.Tests
 
             action.Should()
                   .Throw<ArgumentNullException>()
-                  .And.ParamName.Should()
-                  .Be("testMethodAttribute");
+                  .WithParameter("testMethodAttribute");
         }
 
         [TestMethod]
@@ -83,8 +82,7 @@ namespace Selkie.AutoMocking.Tests
 
             action.Should()
                   .Throw<ArgumentNullException>()
-                  .And.ParamName.Should()
-                  .Be("testMethod");
+                  .WithParameter("testMethod");
         }
 
         [TestMethod]
@@ -144,7 +142,6 @@ namespace Selkie.AutoMocking.Tests
         }
 
         [AutoDataTestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void Invoked_ForLazySutAndNullTest_ReturnsInstance(
             Lazy<Something>         sut,
             [BeNull] ISomethingElse somethingElse)
@@ -158,9 +155,14 @@ namespace Selkie.AutoMocking.Tests
                    .Should()
                    .BeFalse();
 
-                sut.Value
-                   .Should()
-                   .BeNull();
+                Action action = () =>
+                                {
+                                    var actual = sut.Value;
+                                };
+
+                action.Should()
+                      .Throw<ArgumentNullException>()
+                      .WithParameter("something");
             }
         }
 

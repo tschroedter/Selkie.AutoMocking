@@ -148,7 +148,7 @@ namespace Selkie.AutoMocking
                 var count = 0;
 
                 while (current != null &&
-                       count++ < 5)
+                       count++ < 10)
                 {
                     last    = current;
                     current = current.InnerException;
@@ -164,7 +164,6 @@ namespace Selkie.AutoMocking
 
                 throw new ArgumentNullException(argumentException.ParamName,
                                                 argumentException.Message);
-
             }
         }
     }

@@ -40,13 +40,14 @@ namespace Selkie.AutoMocking.Tests
                 _infoString
             };
 
-            Action action = () => CreateSut()
-                               .Create(infos);
+            Action action = () =>
+                            {
+                                CreateSut().Create(infos);
+                            };
 
             action.Should()
                   .Throw<ArgumentNullException>()
-                  .And.ParamName.Should()
-                  .Be(typeof(string).FullName);
+                  .WithParameter(typeof(string).FullName);
         }
 
         [TestMethod]
@@ -58,8 +59,7 @@ namespace Selkie.AutoMocking.Tests
 
             action.Should()
                   .Throw<ArgumentNullException>()
-                  .And.ParamName.Should()
-                  .Be("fixture");
+                  .WithParameter("fixture");
         }
 
         [TestMethod]

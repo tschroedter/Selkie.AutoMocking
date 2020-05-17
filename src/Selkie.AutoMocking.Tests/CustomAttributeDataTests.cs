@@ -40,8 +40,7 @@ namespace Selkie.AutoMocking.Tests
 
             action.Should()
                   .Throw<ArgumentNullException>()
-                  .And.ParamName.Should()
-                  .Be("customAttributeData");
+                  .WithParameter("customAttributeData");
         }
 
         [TestInitialize]
