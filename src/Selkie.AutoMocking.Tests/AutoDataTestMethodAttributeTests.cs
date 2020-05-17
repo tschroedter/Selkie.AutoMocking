@@ -113,8 +113,6 @@ namespace Selkie.AutoMocking.Tests
         [AutoDataTestMethod]
         public void Invoked_ForFirstParameter_ReturnsInstance(Something sut)
         {
-            var test = typeof(Lazy<Something>).FullName;
-
             using (new AssertionScope())
             {
                 sut.Should()
@@ -142,6 +140,27 @@ namespace Selkie.AutoMocking.Tests
                 sut.Value
                    .Should()
                    .BeOfType<Something>();
+            }
+        }
+
+        [AutoDataTestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Invoked_ForLazySutAndNullTest_ReturnsInstance(
+            Lazy<Something>         sut,
+            [BeNull] ISomethingElse somethingElse)
+        {
+            using (new AssertionScope())
+            {
+                sut.Should()
+                   .NotBeNull();
+
+                sut.IsValueCreated
+                   .Should()
+                   .BeFalse();
+
+                sut.Value
+                   .Should()
+                   .BeNull();
             }
         }
 

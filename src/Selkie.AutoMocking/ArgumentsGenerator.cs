@@ -54,15 +54,25 @@ namespace Selkie.AutoMocking
             return info.CustomAttributes.Any(x => x.AttributeType == typeof(FreezeAttribute));
         }
 
+        private static bool IsBeNullParameter(IParameterInfo info)
+        {
+            return info.CustomAttributes.Any(x => x.AttributeType == typeof(BeNullAttribute));
+        }
+
         private object CreateArgument(Type type,
-                                      bool isFreeze)
+                                      bool isFreeze,
+                                      bool isBeNull)
         {
             if (isFreeze) Fixture.Customize(new FreezingCustomization(type));
+
+            if (isBeNull) Fixture.Customize(customization: new BeNullCustomization(type));
 
             var parameter = Fixture.Create(type,
                                            new SpecimenContext(Fixture));
 
-            if (parameter != null) return parameter;
+            if (parameter != null ||
+                isBeNull)
+                return parameter;
 
             var message = string.Format(CultureInfo.InvariantCulture,
                                         $"Failed to create type '{type.FullName}'");
@@ -89,7 +99,8 @@ namespace Selkie.AutoMocking
                 var info = infos[i];
 
                 parameters[i] = CreateArgument(info.ParameterType,
-                                               IsFreezeParameter(info));
+                                               IsFreezeParameter(info),
+                                               IsBeNullParameter(info));
             }
 
             return parameters;
@@ -100,7 +111,8 @@ namespace Selkie.AutoMocking
             if (IsLazy(info)) return ConstructLazy(info.ParameterType.GenericTypeArguments.First());
 
             return CreateArgument(info.ParameterType,
-                                  IsFreezeParameter(info));
+                                  IsFreezeParameter(info),
+                                  IsBeNullParameter(info));
         }
 
         private static bool IsLazy(IParameterInfo info)
@@ -125,7 +137,35 @@ namespace Selkie.AutoMocking
 
         private object Factory(Type type)
         {
-            return CreateArgument(type, false);
+            try
+            {
+                return CreateArgument(type, false, false);
+            }
+            catch (Exception e)
+            {
+                var current = e;
+                var last = current;
+                var count = 0;
+
+                while (current != null &&
+                       count++ < 5)
+                {
+                    last    = current;
+                    current = current.InnerException;
+                }
+
+                if (!(last is ArgumentException argumentException) ||
+                    !argumentException.Message.StartsWith("Value cannot be null."))
+                    throw last;
+
+                Console.WriteLine("Creating ArgumentNullException with "             +
+                                  $"parameter name '{argumentException.ParamName}' " +
+                                  $"and message '{argumentException.Message}'.");
+
+                throw new ArgumentNullException(argumentException.ParamName,
+                                                argumentException.Message);
+
+            }
         }
     }
 }

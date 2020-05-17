@@ -4,6 +4,7 @@ using FluentAssertions;
 using JetBrains.Annotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Selkie.AutoMocking;
 
 namespace Calculator.Tests
@@ -13,6 +14,18 @@ namespace Calculator.Tests
     {
         private IAdd      _add;
         private ISubtract _subtract;
+
+        [AutoDataTestMethod]
+        public void AConstructor_ForAddIsNull_Throws(Lazy<Calculator> sut,
+                                                     [Freeze] IAdd    add)
+        {
+            add = null;
+
+            Action action = () => { var test = sut.Value; };
+
+            action.Should()
+                  .Throws<ArgumentNullException>();
+        }
 
         [AutoDataTestMethod]
         public void Add_ForNumbers_Adds(Calculator    sut,
