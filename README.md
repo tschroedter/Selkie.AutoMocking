@@ -35,7 +35,7 @@ The Calculator will only...
 _The complete source code can be found here: [Example](https://github.com/tschroedter/Selkie.AutoMocking/tree/master/src/Example)_
 
 ### The Calculator Class
-The Calculator class depends on the IAdd interface which is injected in the constructor.
+The Calculator class depends on the IAdd and ISubtract interface which is injected in the constructor.
 
 ```csharp
 public class Calculator : ICalculator
@@ -58,6 +58,19 @@ public class Calculator : ICalculator
 }
 ```
 
+### The Add Class
+The job of the Add class is just to add 2 integers together.
+
+```csharp
+public class Add : IAdd
+{
+    public int Execute(int a, int b)
+    {
+        return a + b;
+    }
+}
+```
+### Unit testing the Calculator's Constructor
 All my constructors in my projects make sure that the injected arguments are not null. This mean that I have to delay the creation of the SUT in my tests using Lazy<T> and being able to set arguments to null. This can be done by using the [BeNull] attribute.
   
 ```csharp  
@@ -74,19 +87,6 @@ public void Create_ForAddIsNull_Throws(Lazy<Calculator> sut,
     action.Should()
           .Throw<ArgumentNullException>()
           .WithParameter("add");
-}
-```
-
-### The Add Class
-The job of the Add class is just to add 2 integers together.
-
-```csharp
-public class Add : IAdd
-{
-    public int Execute(int a, int b)
-    {
-        return a + b;
-    }
 }
 ```
 
