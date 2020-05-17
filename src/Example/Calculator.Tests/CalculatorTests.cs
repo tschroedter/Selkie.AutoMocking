@@ -15,20 +15,6 @@ namespace Calculator.Tests
         private ISubtract _subtract;
 
         [AutoDataTestMethod]
-        public void Constructor_ForAddIsNull_Throws(Lazy<Calculator> sut,
-                                                    [BeNull] IAdd    add)
-        {
-            // ReSharper disable once UnusedVariable
-            Action action = () =>
-                            {
-                                var test = sut.Value;
-                            };
-
-            action.Should()
-                  .Throw<ArgumentNullException>();
-        }
-
-        [AutoDataTestMethod]
         public void Add_ForNumbers_Adds(Calculator    sut,
                                         [Freeze] IAdd add)
         {
