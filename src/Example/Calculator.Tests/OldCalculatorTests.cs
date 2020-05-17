@@ -34,8 +34,7 @@ namespace Calculator.Tests
 
             action.Should()
                   .Throw<ArgumentNullException>()
-                  .And.ParamName.Should()
-                  .Be("add");
+                  .WithParameter("add");
         }
 
         [TestMethod]
@@ -47,8 +46,7 @@ namespace Calculator.Tests
 
             action.Should()
                   .Throw<ArgumentNullException>()
-                  .And.ParamName.Should()
-                  .Be("subtract");
+                  .WithParameter("subtract");
         }
 
         [TestMethod]

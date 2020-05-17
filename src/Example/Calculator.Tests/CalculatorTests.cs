@@ -16,10 +16,13 @@ namespace Calculator.Tests
 
         [AutoDataTestMethod]
         public void Constructor_ForAddIsNull_Throws(Lazy<Calculator> sut,
-                                                     [BeNull] IAdd    add)
+                                                    [BeNull] IAdd    add)
         {
             // ReSharper disable once UnusedVariable
-            Action action = () => { var test = sut.Value; };
+            Action action = () =>
+                            {
+                                var test = sut.Value;
+                            };
 
             action.Should()
                   .Throw<ArgumentNullException>();
@@ -39,30 +42,34 @@ namespace Calculator.Tests
                .Be(3);
         }
 
-        [TestMethod]
-        public void Create_ForAddIsNull_Throws()
+        [AutoDataTestMethod]
+        public void Create_ForAddIsNull_Throws(Lazy<Calculator> sut,
+                                               [BeNull] IAdd    add)
         {
-            _add = null;
-
-            Action action = () => CreateSut();
+            Action action = () =>
+                            {
+                                // ReSharper disable once UnusedVariable
+                                var actual = sut.Value;
+                            };
 
             action.Should()
                   .Throw<ArgumentNullException>()
-                  .And.ParamName.Should()
-                  .Be("add");
+                  .WithParameter("add");
         }
 
-        [TestMethod]
-        public void Create_ForSubtractIsNull_Throws()
+        [AutoDataTestMethod]
+        public void Create_ForSubtractIsNull_Throws(Lazy<Calculator>   sut,
+                                                    [BeNull] ISubtract subtract)
         {
-            _subtract = null;
-
-            Action action = () => CreateSut();
+            Action action = () =>
+                            {
+                                // ReSharper disable once UnusedVariable
+                                var actual = sut.Value;
+                            };
 
             action.Should()
                   .Throw<ArgumentNullException>()
-                  .And.ParamName.Should()
-                  .Be("subtract");
+                  .WithParameter("subtract");
         }
 
         [AutoDataTestMethod]
