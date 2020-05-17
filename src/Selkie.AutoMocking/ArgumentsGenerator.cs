@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using AutoFixture.Kernel;
@@ -12,6 +14,9 @@ namespace Selkie.AutoMocking
 {
     public class ArgumentsGenerator : IArgumentsGenerator
     {
+        private static readonly MethodInfo FactoryMethod =
+            typeof(ArgumentsGenerator).GetMethod(nameof(Factory), BindingFlags.Instance | BindingFlags.NonPublic);
+
         public ArgumentsGenerator()
             : this(new Fixture())
         {
@@ -92,17 +97,7 @@ namespace Selkie.AutoMocking
 
         private object CreateSutArgument(IParameterInfo info)
         {
-            if (IsLazy(info))
-            {
-                // var lazyType = typeof(Lazy<>).MakeGenericType(info.ParameterType.GenericTypeArguments);
-                // var test = Activator.CreateInstance(lazyType);
-                //
-                // return Activator.CreateInstance(lazyType);
-
-                // only supports the first generic argument, which should be the SUT
-                return new Lazy<object>(() => CreateArgument(info.ParameterType.GenericTypeArguments.First(),
-                                                             IsFreezeParameter(info)));
-            }
+            if (IsLazy(info)) return ConstructLazy(info.ParameterType.GenericTypeArguments.First());
 
             return CreateArgument(info.ParameterType,
                                   IsFreezeParameter(info));
@@ -111,10 +106,26 @@ namespace Selkie.AutoMocking
         private static bool IsLazy(IParameterInfo info)
         {
             // todo there should be a better way of checking this
-            // info.ParameterType.UnderlyingSystemType == typeof(Lazy<>)
+            //      like info.ParameterType.UnderlyingSystemType == typeof(Lazy<>)
             return info.ParameterType.IsGenericType                                        &&
                    !string.IsNullOrEmpty(info.ParameterType.UnderlyingSystemType.FullName) &&
                    info.ParameterType.UnderlyingSystemType.FullName.StartsWith(typeof(Lazy<>).FullName ?? string.Empty);
+        }
+
+        public object ConstructLazy(Type desiredType)
+        {
+            var methodCall = Expression.Call(Expression.Constant(this),
+                                             FactoryMethod,
+                                             Expression.Constant(desiredType));
+            var cast     = Expression.Convert(methodCall, desiredType);
+            var lambda   = Expression.Lambda(cast).Compile();
+            var lazyType = typeof(Lazy<>).MakeGenericType(desiredType);
+            return Activator.CreateInstance(lazyType, lambda);
+        }
+
+        private object Factory(Type type)
+        {
+            return CreateArgument(type, false);
         }
     }
 }

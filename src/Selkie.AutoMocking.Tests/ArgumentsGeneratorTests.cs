@@ -395,16 +395,14 @@ namespace Selkie.AutoMocking.Tests
 
                 var lazy = actual[0] as Lazy<string>;
 
-                lazy.Should()
-                    .NotBeNull();
-
                 lazy?.IsValueCreated
                      .Should()
                      .BeFalse();
 
-                lazy?.Value
-                     .Should()
-                     .NotBeNull();
+                var lazyValue = lazy?.Value;
+
+                lazyValue?.Should()
+                          .NotBeNull();
             }
         }
 
@@ -428,7 +426,7 @@ namespace Selkie.AutoMocking.Tests
                       .Should()
                       .Be(1);
 
-                var lazy = actual[0] as Lazy<object>;
+                var lazy = actual[0] as Lazy<Something>;
 
                 lazy.Should()
                     .NotBeNull();
@@ -437,7 +435,7 @@ namespace Selkie.AutoMocking.Tests
                      .Should()
                      .BeFalse();
 
-                var lazyValue = lazy?.Value as Something;
+                var lazyValue = lazy?.Value;
 
                 lazyValue?.Should()
                           .NotBeNull();
