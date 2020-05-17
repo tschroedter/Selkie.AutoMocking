@@ -40,17 +40,40 @@ The Calculator class depends on the IAdd interface which is injected in the cons
 ```csharp
 public class Calculator : ICalculator
 {
-    private readonly IAdd _add;
+    private readonly IAdd      _add;
+    private readonly ISubtract _subtract;
 
-    public Calculator([NotNull] IAdd add)
+    public Calculator([NotNull] IAdd      add,
+                      [NotNull] ISubtract subtract)
     {
-        _add = add;
-    }
+        Guard.ArgumentNotNull(add,
+                              nameof(add));
+        Guard.ArgumentNotNull(subtract,
+                              nameof(subtract));
 
-    public int Add(int a, int b)
-    {
-        return _add.Execute(a, b);
+        _add      = add;
+        _subtract = subtract;
     }
+    ...
+}
+```
+
+All my constructors in my projects make sure that the injected arguments are not null. This mean that I have to delay the creation of the SUT in my tests using Lazy<T> and being able to set arguments to null. This can be done by using the [BeNull] attribute.
+  
+```csharp  
+[AutoDataTestMethod]
+public void Create_ForAddIsNull_Throws(Lazy<Calculator> sut,
+                                       [BeNull] IAdd    add)
+{
+    Action action = () =>
+                    {
+                        // ReSharper disable once UnusedVariable
+                        var actual = sut.Value;
+                    };
+
+    action.Should()
+          .Throw<ArgumentNullException>()
+          .WithParameter("add");
 }
 ```
 
