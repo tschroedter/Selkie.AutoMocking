@@ -65,7 +65,7 @@ namespace Selkie.AutoMocking
         {
             if (isFreeze) Fixture.Customize(new FreezingCustomization(type));
 
-            if (isBeNull) Fixture.Customize(customization: new BeNullCustomization(type));
+            if (isBeNull) Fixture.Customize(new BeNullCustomization(type));
 
             var parameter = Fixture.Create(type,
                                            new SpecimenContext(Fixture));
@@ -144,8 +144,8 @@ namespace Selkie.AutoMocking
             catch (Exception e)
             {
                 var current = e;
-                var last = current;
-                var count = 0;
+                var last    = current;
+                var count   = 0;
 
                 while (current != null &&
                        count++ < 10)

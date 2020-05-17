@@ -40,10 +40,7 @@ namespace Selkie.AutoMocking.Tests
                 _infoString
             };
 
-            Action action = () =>
-                            {
-                                CreateSut().Create(infos);
-                            };
+            Action action = () => { CreateSut().Create(infos); };
 
             action.Should()
                   .Throw<ArgumentNullException>()

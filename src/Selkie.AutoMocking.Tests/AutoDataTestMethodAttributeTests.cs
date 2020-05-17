@@ -157,6 +157,7 @@ namespace Selkie.AutoMocking.Tests
 
                 Action action = () =>
                                 {
+                                    // ReSharper disable once UnusedVariable
                                     var actual = sut.Value;
                                 };
 
