@@ -117,11 +117,8 @@ namespace Selkie.AutoMocking
 
         private static bool IsLazy(IParameterInfo info)
         {
-            // todo there should be a better way of checking this
-            //      like info.ParameterType.UnderlyingSystemType == typeof(Lazy<>)
-            return info.ParameterType.IsGenericType                                        &&
-                   !string.IsNullOrEmpty(info.ParameterType.UnderlyingSystemType.FullName) &&
-                   info.ParameterType.UnderlyingSystemType.FullName.StartsWith(typeof(Lazy<>).FullName ?? string.Empty);
+            return info.ParameterType.IsGenericType &&
+                   info.ParameterType.GetGenericTypeDefinition() == typeof(Lazy<>);
         }
 
         public object ConstructLazy(Type desiredType)
