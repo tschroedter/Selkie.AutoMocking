@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace Selkie.AutoMocking.Interfaces
@@ -7,5 +8,9 @@ namespace Selkie.AutoMocking.Interfaces
     {
         [NotNull]
         object[] Create([NotNull] IEnumerable<IParameterInfo> parameterInfos);
+
+        object CreateArgument(Type type,
+                              bool isFreeze = false,
+                              bool isBeNull = false);
     }
 }

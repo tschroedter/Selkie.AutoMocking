@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using AutoFixture.Kernel;
@@ -14,28 +12,32 @@ namespace Selkie.AutoMocking
 {
     public class ArgumentsGenerator : IArgumentsGenerator
     {
-        private static readonly MethodInfo FactoryMethod =
-            typeof(ArgumentsGenerator).GetMethod(nameof(Factory), BindingFlags.Instance | BindingFlags.NonPublic);
+        private readonly IFixture    _fixture;
+        private readonly ISutCreator _sutCreator;
 
         public ArgumentsGenerator()
-            : this(new Fixture())
+            : this(new Fixture(),
+                   new SutCreator(new SutInstanceCreator(new ArgumentNullExceptionFinder()),
+                                  new SutLazyInstanceCreator(new ArgumentNullExceptionFinder())))
         {
         }
 
-        internal ArgumentsGenerator([NotNull] IFixture fixture)
+        internal ArgumentsGenerator([NotNull] IFixture    fixture,
+                                    [NotNull] ISutCreator sutCreator)
         {
             Guard.ArgumentNotNull(fixture,
                                   nameof(fixture));
+            Guard.ArgumentNotNull(sutCreator,
+                                  nameof(sutCreator));
 
-            Fixture = fixture;
+            _fixture    = fixture;
+            _sutCreator = sutCreator;
 
-            Fixture.Customize(new AutoNSubstituteCustomization
-                              {
-                                  ConfigureMembers = true
-                              });
+            _fixture.Customize(new AutoNSubstituteCustomization
+                               {
+                                   ConfigureMembers = true
+                               });
         }
-
-        public IFixture Fixture { get; }
 
         public object[] Create(IEnumerable<IParameterInfo> parameterInfos)
         {
@@ -49,26 +51,19 @@ namespace Selkie.AutoMocking
                        : CreateArguments(infos);
         }
 
-        private static bool IsFreezeParameter(IParameterInfo info)
+        public object CreateArgument([NotNull] Type type,
+                                     bool           isFreeze = false,
+                                     bool           isBeNull = false)
         {
-            return info.CustomAttributes.Any(x => x.AttributeType == typeof(FreezeAttribute));
-        }
+            Guard.ArgumentNotNull(type,
+                                  nameof(type));
 
-        private static bool IsBeNullParameter(IParameterInfo info)
-        {
-            return info.CustomAttributes.Any(x => x.AttributeType == typeof(BeNullAttribute));
-        }
+            if (isFreeze) _fixture.Customize(new FreezingCustomization(type));
 
-        private object CreateArgument(Type type,
-                                      bool isFreeze,
-                                      bool isBeNull)
-        {
-            if (isFreeze) Fixture.Customize(new FreezingCustomization(type));
+            if (isBeNull) _fixture.Customize(new BeNullCustomization(type));
 
-            if (isBeNull) Fixture.Customize(new BeNullCustomization(type));
-
-            var parameter = Fixture.Create(type,
-                                           new SpecimenContext(Fixture));
+            var parameter = _fixture.Create(type,
+                                            new SpecimenContext(_fixture));
 
             if (parameter != null ||
                 isBeNull)
@@ -81,11 +76,22 @@ namespace Selkie.AutoMocking
                                             message);
         }
 
+        private static bool IsFreezeParameter(IParameterInfo info)
+        {
+            return info.CustomAttributes.Any(x => x.AttributeType == typeof(FreezeAttribute));
+        }
+
+        private static bool IsBeNullParameter(IParameterInfo info)
+        {
+            return info.CustomAttributes.Any(x => x.AttributeType == typeof(BeNullAttribute));
+        }
+
         private object[] CreateArguments(IParameterInfo[] infos)
         {
             var parameters = CreateOtherArguments(infos);
 
-            parameters[0] = CreateSutArgument(infos[0]);
+            parameters[0] = _sutCreator.Construct(this,
+                                                  infos[0].ParameterType);
 
             return parameters;
         }
@@ -104,64 +110,6 @@ namespace Selkie.AutoMocking
             }
 
             return parameters;
-        }
-
-        private object CreateSutArgument(IParameterInfo info)
-        {
-            if (IsLazy(info)) return ConstructLazy(info.ParameterType.GenericTypeArguments.First());
-
-            return CreateArgument(info.ParameterType,
-                                  IsFreezeParameter(info),
-                                  IsBeNullParameter(info));
-        }
-
-        private static bool IsLazy(IParameterInfo info)
-        {
-            return info.ParameterType.IsGenericType &&
-                   info.ParameterType.GetGenericTypeDefinition() == typeof(Lazy<>);
-        }
-
-        public object ConstructLazy(Type desiredType)
-        {
-            var methodCall = Expression.Call(Expression.Constant(this),
-                                             FactoryMethod,
-                                             Expression.Constant(desiredType));
-            var cast     = Expression.Convert(methodCall, desiredType);
-            var lambda   = Expression.Lambda(cast).Compile();
-            var lazyType = typeof(Lazy<>).MakeGenericType(desiredType);
-            return Activator.CreateInstance(lazyType, lambda);
-        }
-
-        private object Factory(Type type)
-        {
-            try
-            {
-                return CreateArgument(type, false, false);
-            }
-            catch (Exception e)
-            {
-                var current = e;
-                var last    = current;
-                var count   = 0;
-
-                while (current != null &&
-                       count++ < 10)
-                {
-                    last    = current;
-                    current = current.InnerException;
-                }
-
-                if (!(last is ArgumentException argumentException) ||
-                    !argumentException.Message.StartsWith("Value cannot be null."))
-                    throw last;
-
-                Console.WriteLine("Creating ArgumentNullException with "             +
-                                  $"parameter name '{argumentException.ParamName}' " +
-                                  $"and message '{argumentException.Message}'.");
-
-                throw new ArgumentNullException(argumentException.ParamName,
-                                                argumentException.Message);
-            }
         }
     }
 }

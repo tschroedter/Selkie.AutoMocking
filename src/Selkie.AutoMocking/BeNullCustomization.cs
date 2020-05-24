@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -7,13 +8,25 @@ using AutoFixture.Kernel;
 
 namespace Selkie.AutoMocking
 {
-    public class BeNullCustomization : ICustomization
+    /// <summary>
+    ///     Customization that supports setting a registered type to be always
+    ///     null when resolved.
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    public class BeNullCustomization
+        : ICustomization
     {
+        // todo testing
         public BeNullCustomization(Type targetType)
             : this(targetType, targetType)
         {
         }
 
+        /// <summary>
+        ///     Set the given registered type to be always null.
+        /// </summary>
+        /// <param name="targetType"></param>
+        /// <param name="registeredType"></param>
         public BeNullCustomization(Type targetType, Type registeredType)
         {
             if (targetType     == null) throw new ArgumentNullException(nameof(targetType));
@@ -23,7 +36,7 @@ namespace Selkie.AutoMocking
             {
                 var message = string.Format(
                                             CultureInfo.CurrentCulture,
-                                            "The type '{0}' cannot be frozen as '{1}' because the two types are not compatible.",
+                                            "The type '{0}' cannot be set to null as '{1}' because the two types are not compatible.",
                                             targetType,
                                             registeredType);
                 throw new ArgumentException(message);
@@ -44,6 +57,12 @@ namespace Selkie.AutoMocking
         /// </summary>
         public Type RegisteredType { get; }
 
+        /// <summary>
+        ///     Add the customization for a NullBuilder to the given <see cref="IFixture" />.
+        /// </summary>
+        /// <param name="fixture">
+        ///     The <see cref="IFixture" /> to be customized.
+        /// </param>
         public void Customize(IFixture fixture)
         {
             if (fixture == null)
@@ -57,14 +76,16 @@ namespace Selkie.AutoMocking
                             RegisteredType
                         };
 
-            var builder = new CompositeSpecimenBuilder(
-                                                       from t in types
-                                                       select SpecimenBuilderNodeFactory.CreateTypedNode(
-                                                                                                         t,
-                                                                                                         fixedBuilder)
-                                                                  as ISpecimenBuilder);
+            var specimenBuilders = from t in types
+                                   select SpecimenBuilderNodeFactory.CreateTypedNode(t,
+                                                                                     fixedBuilder)
+                                              as ISpecimenBuilder;
 
-            fixture.Customizations.Insert(0, builder);
+            var builder = new CompositeSpecimenBuilder(specimenBuilders);
+
+            fixture.Customizations
+                   .Insert(0,
+                           builder);
         }
     }
 }

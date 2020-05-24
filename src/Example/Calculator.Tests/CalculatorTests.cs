@@ -44,6 +44,13 @@ namespace Calculator.Tests
         }
 
         [AutoDataTestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Create_ForSubtractIsNullNotLazy_Throws(Calculator         sut,
+                                                           [BeNull] ISubtract subtract)
+        {
+        }
+
+        [AutoDataTestMethod]
         public void Create_ForSubtractIsNull_Throws(Lazy<Calculator>   sut,
                                                     [BeNull] ISubtract subtract)
         {

@@ -25,6 +25,7 @@ namespace Selkie.AutoMocking.Tests
         private IParameterInfo         _infoString;
         private IParameterInfo         _infoStringFreeze;
         private IParameterInfo         _infoSut;
+        private SutCreator             _sutCreator;
 
         [TestMethod]
         public void Create_ForCanNotCreateType_Throws()
@@ -57,6 +58,18 @@ namespace Selkie.AutoMocking.Tests
             action.Should()
                   .Throw<ArgumentNullException>()
                   .WithParameter("fixture");
+        }
+
+        [TestMethod]
+        public void Create_ForSutCreatorIsNull_Throws()
+        {
+            _sutCreator = null;
+
+            Action action = () => CreateSut();
+
+            action.Should()
+                  .Throw<ArgumentNullException>()
+                  .WithParameter("sutCreator");
         }
 
         [TestMethod]
@@ -443,7 +456,8 @@ namespace Selkie.AutoMocking.Tests
         public void TestInitialize()
         {
             _fixture = new Fixture();
-
+            _sutCreator = new SutCreator(new SutInstanceCreator(new ArgumentNullExceptionFinder()),
+                                         new SutLazyInstanceCreator(new ArgumentNullExceptionFinder()));
             _freezeAttribute = Substitute.For<ICustomAttributeData>();
             _freezeAttribute.AttributeType.Returns(typeof(FreezeAttribute));
 
@@ -476,7 +490,8 @@ namespace Selkie.AutoMocking.Tests
 
         private ArgumentsGenerator CreateSut()
         {
-            return new ArgumentsGenerator(_fixture);
+            return new ArgumentsGenerator(_fixture,
+                                          _sutCreator);
         }
     }
 }
