@@ -1,8 +1,6 @@
 ﻿using System;
 using Calculator.Interfaces;
 using FluentAssertions;
-using JetBrains.Annotations;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Selkie.AutoMocking;
 
@@ -11,9 +9,6 @@ namespace Calculator.Tests
     [AutoDataTestClass]
     public class CalculatorTests
     {
-        private IAdd      _add;
-        private ISubtract _subtract;
-
         [AutoDataTestMethod]
         public void Add_ForNumbers_Adds(Calculator    sut,
                                         [Freeze] IAdd add)
@@ -32,9 +27,9 @@ namespace Calculator.Tests
         public void Create_ForAddIsNull_Throws(Lazy<Calculator> sut,
                                                [BeNull] IAdd    add)
         {
+            // ReSharper disable once UnusedVariable
             Action action = () =>
                             {
-                                // ReSharper disable once UnusedVariable
                                 var actual = sut.Value;
                             };
 
@@ -44,19 +39,12 @@ namespace Calculator.Tests
         }
 
         [AutoDataTestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void Create_ForSubtractIsNullNotLazy_Throws(Calculator         sut,
-                                                           [BeNull] ISubtract subtract)
-        {
-        }
-
-        [AutoDataTestMethod]
         public void Create_ForSubtractIsNull_Throws(Lazy<Calculator>   sut,
                                                     [BeNull] ISubtract subtract)
         {
+            // ReSharper disable once UnusedVariable
             Action action = () =>
                             {
-                                // ReSharper disable once UnusedVariable
                                 var actual = sut.Value;
                             };
 
@@ -77,20 +65,6 @@ namespace Calculator.Tests
                          2)
                .Should()
                .Be(-1);
-        }
-
-        [TestInitialize]
-        public void TestInitialize()
-        {
-            _add      = Substitute.For<IAdd>();
-            _subtract = Substitute.For<ISubtract>();
-        }
-
-        [UsedImplicitly]
-        private Calculator CreateSut()
-        {
-            return new Calculator(_add,
-                                  _subtract);
         }
     }
 }
