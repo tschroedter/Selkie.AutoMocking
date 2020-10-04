@@ -62,11 +62,13 @@ namespace Selkie.AutoMocking
                                     nameof ( type ) ) ;
 
             if ( ! isPopulateProperties )
-                _fixture.Customize ( new DoNotSetPropertyCustomization ( type ) ) ; // todo testing
+                _fixture.Customize ( new DoNotSetPropertyCustomization ( type ) ) ;
 
-            if ( isFreeze ) _fixture.Customize ( new FreezingCustomization ( type ) ) ;
+            if ( isFreeze )
+                _fixture.Customize ( new FreezingCustomization ( type ) ) ;
 
-            if ( isBeNull ) _fixture.Customize ( new BeNullCustomization ( type ) ) ;
+            if ( isBeNull )
+                _fixture.Customize ( new BeNullCustomization ( type ) ) ;
 
             var parameter = _fixture.Create ( type ,
                                               new SpecimenContext ( _fixture ) ) ;
@@ -82,7 +84,7 @@ namespace Selkie.AutoMocking
                                               message ) ;
         }
 
-        public object CreateOtherArgument ( IParameterInfo info ) // todo testing
+        public object CreateOtherArgument ( IParameterInfo info )
         {
             Guard.ArgumentNotNull ( info , nameof ( info ) ) ;
 
@@ -117,7 +119,7 @@ namespace Selkie.AutoMocking
             return parameters ;
         }
 
-        private object [ ] CreateOtherArguments ( IParameterInfo [ ] infos ) // todo use CreateOtherArgument
+        private object [ ] CreateOtherArguments ( IParameterInfo [ ] infos )
         {
             var parameters = new object[ infos.Length ] ;
 
