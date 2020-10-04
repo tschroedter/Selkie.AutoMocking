@@ -1,143 +1,143 @@
-﻿using System;
-using System.Linq;
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
-using Selkie.AutoMocking.Interfaces;
-using Selkie.AutoMocking.Tests.TestClasses;
+﻿using System ;
+using System.Linq ;
+using FluentAssertions ;
+using Microsoft.VisualStudio.TestTools.UnitTesting ;
+using NSubstitute ;
+using Selkie.AutoMocking.Interfaces ;
+using Selkie.AutoMocking.Tests.TestClasses ;
 
 namespace Selkie.AutoMocking.Tests
 {
-    [TestClass]
+    [ TestClass ]
     public class SutCreatorTests
     {
-        private Something               _class;
-        private ISutInstanceCreator     _creator;
-        private IArgumentsGenerator     _generator;
-        private Lazy<Something>         _lazyClass;
-        private ISutLazyInstanceCreator _lazyCreator;
-        private Type                    _typeClass;
-        private Type                    _typeLazyClass;
+        private Something               _class ;
+        private ISutInstanceCreator     _creator ;
+        private IArgumentsGenerator     _generator ;
+        private Lazy < Something >      _lazyClass ;
+        private ISutLazyInstanceCreator _lazyCreator ;
+        private Type                    _typeClass ;
+        private Type                    _typeLazyClass ;
 
-        [TestInitialize]
-        public void Initialize()
+        [ TestInitialize ]
+        public void Initialize ( )
         {
-            _creator       = Substitute.For<ISutInstanceCreator>();
-            _lazyCreator   = Substitute.For<ISutLazyInstanceCreator>();
-            _generator     = Substitute.For<IArgumentsGenerator>();
-            _typeClass     = typeof(Something);
-            _typeLazyClass = typeof(Lazy<Something>);
-            _class         = new Something(new SomethingElse());
-            _lazyClass     = new Lazy<Something>(() => new Something(new SomethingElse()));
+            _creator       = Substitute.For < ISutInstanceCreator > ( ) ;
+            _lazyCreator   = Substitute.For < ISutLazyInstanceCreator > ( ) ;
+            _generator     = Substitute.For < IArgumentsGenerator > ( ) ;
+            _typeClass     = typeof ( Something ) ;
+            _typeLazyClass = typeof ( Lazy < Something > ) ;
+            _class         = new Something ( new SomethingElse ( ) ) ;
+            _lazyClass     = new Lazy < Something > ( ( ) => new Something ( new SomethingElse ( ) ) ) ;
         }
 
-        [TestMethod]
-        public void Constructor_ForCreatorIsNull_Throws()
+        [ TestMethod ]
+        public void Constructor_ForCreatorIsNull_Throws ( )
         {
-            _creator = null;
+            _creator = null ;
 
-            Action action = () => { CreateSut(); };
+            Action action = ( ) => { CreateSut ( ) ; } ;
 
-            action.Should()
-                  .Throw<ArgumentNullException>()
-                  .WithParameter("creator");
+            action.Should ( )
+                  .Throw < ArgumentNullException > ( )
+                  .WithParameter ( "creator" ) ;
         }
 
-        [TestMethod]
-        public void Constructor_ForLazyCreatorIsNull_Throws()
+        [ TestMethod ]
+        public void Constructor_ForLazyCreatorIsNull_Throws ( )
         {
-            _lazyCreator = null;
+            _lazyCreator = null ;
 
-            Action action = () => { CreateSut(); };
+            Action action = ( ) => { CreateSut ( ) ; } ;
 
-            action.Should()
-                  .Throw<ArgumentNullException>()
-                  .WithParameter("lazyCreator");
+            action.Should ( )
+                  .Throw < ArgumentNullException > ( )
+                  .WithParameter ( "lazyCreator" ) ;
         }
 
-        [TestMethod]
-        public void Construct_ForGeneratorIsNull_Throws()
+        [ TestMethod ]
+        public void Construct_ForGeneratorIsNull_Throws ( )
         {
             // ReSharper disable once AssignNullToNotNullAttribute
-            Action action = () => { CreateSut().Construct(null, _typeClass); };
+            Action action = ( ) => { CreateSut ( ).Construct ( null , _typeClass ) ; } ;
 
-            action.Should()
-                  .Throw<ArgumentNullException>()
-                  .WithParameter("generator");
+            action.Should ( )
+                  .Throw < ArgumentNullException > ( )
+                  .WithParameter ( "generator" ) ;
         }
 
-        [TestMethod]
-        public void Construct_ForTypeIsNull_Throws()
+        [ TestMethod ]
+        public void Construct_ForTypeIsNull_Throws ( )
         {
             // ReSharper disable once AssignNullToNotNullAttribute
-            Action action = () => { CreateSut().Construct(_generator, null); };
+            Action action = ( ) => { CreateSut ( ).Construct ( _generator , null ) ; } ;
 
-            action.Should()
-                  .Throw<ArgumentNullException>()
-                  .WithParameter("type");
+            action.Should ( )
+                  .Throw < ArgumentNullException > ( )
+                  .WithParameter ( "type" ) ;
         }
 
-        [TestMethod]
-        public void Construct_ForTypeClass_Instance()
+        [ TestMethod ]
+        public void Construct_ForTypeClass_Instance ( )
         {
-            _creator.Construct(_generator,
-                               _typeClass)
-                    .Returns(_class);
+            _creator.Construct ( _generator ,
+                                 _typeClass )
+                    .Returns ( _class ) ;
 
-            CreateSut().Construct(_generator,
-                                  _typeClass)
-                       .Should()
-                       .Be(_class);
+            CreateSut ( ).Construct ( _generator ,
+                                      _typeClass )
+                         .Should ( )
+                         .Be ( _class ) ;
         }
 
-        [TestMethod]
-        public void Construct_ForTypeLazyClass_Instance()
+        [ TestMethod ]
+        public void Construct_ForTypeLazyClass_Instance ( )
         {
-            _lazyCreator.Construct(_generator,
-                                   _typeLazyClass.GenericTypeArguments
-                                                 .First())
-                        .Returns(_lazyClass);
+            _lazyCreator.Construct ( _generator ,
+                                     _typeLazyClass.GenericTypeArguments
+                                                   .First ( ) )
+                        .Returns ( _lazyClass ) ;
 
-            CreateSut().Construct(_generator,
-                                  _typeLazyClass)
-                       .Should()
-                       .Be(_lazyClass);
+            CreateSut ( ).Construct ( _generator ,
+                                      _typeLazyClass )
+                         .Should ( )
+                         .Be ( _lazyClass ) ;
         }
 
-        [TestMethod]
-        public void Construct_ForTypeClass_InstanceWithPropertySetByDependency()
+        [ TestMethod ]
+        public void Construct_ForTypeClass_InstanceWithPropertySetByDependency ( )
         {
-            var sut = new SutCreator(new SutInstanceCreator(new ArgumentNullExceptionFinder()),
-                new SutLazyInstanceCreator(new ArgumentNullExceptionFinder(),
-                                           new CustomAttributeFinder()));
+            var sut = new SutCreator ( new SutInstanceCreator ( new ArgumentNullExceptionFinder ( ) ) ,
+                                       new SutLazyInstanceCreator ( new ArgumentNullExceptionFinder ( ) ,
+                                                                    new CustomAttributeFinder ( ) ) ) ;
 
-            var construct = sut.Construct(new ArgumentsGenerator(),
-                typeof(Device)) as Device;
+            var construct = sut.Construct ( new ArgumentsGenerator ( ) ,
+                                            typeof ( Device ) ) as Device ;
 
             construct?.PopulatedByDependency
-                .Should()
-                .NotBeNull();
+                      .Should ( )
+                      .NotBeNull ( ) ;
         }
 
-        [TestMethod]
-        public void Construct_ForTypeClass_InstanceWithPropertyNotAutoPopulated()
+        [ TestMethod ]
+        public void Construct_ForTypeClass_InstanceWithPropertyNotAutoPopulated ( )
         {
-            var sut = new SutCreator(new SutInstanceCreator(new ArgumentNullExceptionFinder()),
-                new SutLazyInstanceCreator(new ArgumentNullExceptionFinder(),
-                                           new CustomAttributeFinder()));
+            var sut = new SutCreator ( new SutInstanceCreator ( new ArgumentNullExceptionFinder ( ) ) ,
+                                       new SutLazyInstanceCreator ( new ArgumentNullExceptionFinder ( ) ,
+                                                                    new CustomAttributeFinder ( ) ) ) ;
 
-            var construct = sut.Construct(new ArgumentsGenerator(),
-                typeof(Device)) as Device;
+            var construct = sut.Construct ( new ArgumentsGenerator ( ) ,
+                                            typeof ( Device ) ) as Device ;
 
             construct?.NotAutoPopulated
-                .Should()
-                .Be(Device.SomeText);
+                      .Should ( )
+                      .Be ( Device.SomeText ) ;
         }
 
-        private SutCreator CreateSut()
+        private SutCreator CreateSut ( )
         {
-            return new SutCreator(_creator,
-                                  _lazyCreator);
+            return new SutCreator ( _creator ,
+                                    _lazyCreator ) ;
         }
     }
 }

@@ -1,213 +1,213 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using FluentAssertions;
-using FluentAssertions.Execution;
-using JetBrains.Annotations;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
-using Selkie.AutoMocking.Tests.TestClasses;
+﻿using System ;
+using System.Collections.Generic ;
+using System.Diagnostics.CodeAnalysis ;
+using System.Globalization ;
+using FluentAssertions ;
+using FluentAssertions.Execution ;
+using JetBrains.Annotations ;
+using Microsoft.VisualStudio.TestTools.UnitTesting ;
+using NSubstitute ;
+using Selkie.AutoMocking.Tests.TestClasses ;
 
 namespace Selkie.AutoMocking.Tests
 {
-    [AutoDataTestClass]
+    [ AutoDataTestClass ]
     public class AutoDataTestMethodAttributeTests
     {
-        private const string MethodNameWithInterface = "WithInterface";
+        private const string MethodNameWithInterface = "WithInterface" ;
 
-        private System.Reflection.ParameterInfo[] _parameterInfoString;
-        private ITestMethod                       _testMethod;
-        private TestMethodAttribute               _testMethodAttribute;
+        private System.Reflection.ParameterInfo [ ] _parameterInfoString ;
+        private ITestMethod                         _testMethod ;
+        private TestMethodAttribute                 _testMethodAttribute ;
 
-        [ExcludeFromCodeCoverage]
-        [UsedImplicitly]
-        public static System.Reflection.ParameterInfo[] WithInterface([Freeze] ISomething _)
+        [ ExcludeFromCodeCoverage ]
+        [ UsedImplicitly ]
+        public static System.Reflection.ParameterInfo [ ] WithInterface ( [ Freeze ] ISomething _ )
         {
-            return Array.Empty<System.Reflection.ParameterInfo>();
+            return Array.Empty < System.Reflection.ParameterInfo > ( ) ;
         }
 
-        [TestMethod]
-        public void Constructor_ForTestMethodAttributeIsNull_Throws()
+        [ TestMethod ]
+        public void Constructor_ForTestMethodAttributeIsNull_Throws ( )
         {
-            Action action = () => CreateSut(null);
+            Action action = ( ) => CreateSut ( null ) ;
 
-            action.Should()
-                  .Throw<ArgumentNullException>()
-                  .WithParameter("testMethodAttribute");
+            action.Should ( )
+                  .Throw < ArgumentNullException > ( )
+                  .WithParameter ( "testMethodAttribute" ) ;
         }
 
-        [TestMethod]
-        public void Constructor_Invoked_SetsGenerator()
+        [ TestMethod ]
+        public void Constructor_Invoked_SetsGenerator ( )
         {
-            CreateSut(_testMethodAttribute)
+            CreateSut ( _testMethodAttribute )
                .Generator
-               .Should()
-               .NotBeNull();
+               .Should ( )
+               .NotBeNull ( ) ;
         }
 
-        [TestMethod]
-        public void Constructor_Invoked_SetsTestMethodAttribute()
+        [ TestMethod ]
+        public void Constructor_Invoked_SetsTestMethodAttribute ( )
         {
-            CreateSut(_testMethodAttribute)
+            CreateSut ( _testMethodAttribute )
                .TestMethodAttribute
-               .Should()
-               .NotBeNull();
+               .Should ( )
+               .NotBeNull ( ) ;
         }
 
-        [TestMethod]
-        public void DefaultConstructor_Invoked_SetsGenerator()
+        [ TestMethod ]
+        public void DefaultConstructor_Invoked_SetsGenerator ( )
         {
-            CreateSut()
+            CreateSut ( )
                .Generator
-               .Should()
-               .NotBeNull();
+               .Should ( )
+               .NotBeNull ( ) ;
         }
 
-        [TestMethod]
-        public void DefaultConstructor_Invoked_TestMethodAttributeIsNull()
+        [ TestMethod ]
+        public void DefaultConstructor_Invoked_TestMethodAttributeIsNull ( )
         {
-            CreateSut()
+            CreateSut ( )
                .TestMethodAttribute
-               .Should()
-               .BeNull();
+               .Should ( )
+               .BeNull ( ) ;
         }
 
-        [TestMethod]
-        public void Execute_ForTestMethodIsNull_Throws()
+        [ TestMethod ]
+        public void Execute_ForTestMethodIsNull_Throws ( )
         {
             // ReSharper disable once AssignNullToNotNullAttribute
-            Action action = () => CreateSut()
-                               .Execute(null);
+            Action action = ( ) => CreateSut ( )
+                               .Execute ( null ) ;
 
-            action.Should()
-                  .Throw<ArgumentNullException>()
-                  .WithParameter("testMethod");
+            action.Should ( )
+                  .Throw < ArgumentNullException > ( )
+                  .WithParameter ( "testMethod" ) ;
         }
 
-        [TestMethod]
-        public void Execute_ForTestMethodWithoutParameters_Invoked()
+        [ TestMethod ]
+        public void Execute_ForTestMethodWithoutParameters_Invoked ( )
         {
-            CreateSut()
-               .Execute(_testMethod);
+            CreateSut ( )
+               .Execute ( _testMethod ) ;
 
-            _testMethod.Received()
-                       .Invoke(Arg.Any<object[]>());
+            _testMethod.Received ( )
+                       .Invoke ( Arg.Any < object [ ] > ( ) ) ;
         }
 
-        [TestMethod]
-        public void Execute_ForTestMethodWithParameters_Invoked()
+        [ TestMethod ]
+        public void Execute_ForTestMethodWithParameters_Invoked ( )
         {
             _testMethod.ParameterTypes
-                       .Returns(_parameterInfoString);
+                       .Returns ( _parameterInfoString ) ;
 
-            CreateSut()
-               .Execute(_testMethod);
+            CreateSut ( )
+               .Execute ( _testMethod ) ;
 
-            _testMethod.Received()
-                       .Invoke(Arg.Is<object[]>(x => ExpectedObjects(x)));
+            _testMethod.Received ( )
+                       .Invoke ( Arg.Is < object [ ] > ( x => ExpectedObjects ( x ) ) ) ;
         }
 
-        [AutoDataTestMethod]
-        public void Invoked_ForFirstParameter_ReturnsInstance(Something sut)
+        [ AutoDataTestMethod ]
+        public void Invoked_ForFirstParameter_ReturnsInstance ( Something sut )
         {
-            using (new AssertionScope())
+            using ( new AssertionScope ( ) )
             {
-                sut.Should()
-                   .NotBeNull("Instance should be created");
+                sut.Should ( )
+                   .NotBeNull ( "Instance should be created" ) ;
 
-                sut?.GetType()
-                    .Should()
-                    .Be<Something>("Instance should be of given type");
+                sut?.GetType ( )
+                    .Should ( )
+                    .Be < Something > ( "Instance should be of given type" ) ;
             }
         }
 
-        [AutoDataTestMethod]
-        public void Invoked_ForLazySut_ReturnsInstance(
-            Lazy<Something> sut)
+        [ AutoDataTestMethod ]
+        public void Invoked_ForLazySut_ReturnsInstance (
+            Lazy < Something > sut )
         {
-            using (new AssertionScope())
+            using ( new AssertionScope ( ) )
             {
-                sut.Should()
-                   .NotBeNull();
+                sut.Should ( )
+                   .NotBeNull ( ) ;
 
                 sut.IsValueCreated
-                   .Should()
-                   .BeFalse();
+                   .Should ( )
+                   .BeFalse ( ) ;
 
                 sut.Value
-                   .Should()
-                   .BeOfType<Something>();
+                   .Should ( )
+                   .BeOfType < Something > ( ) ;
             }
         }
 
-        [AutoDataTestMethod]
-        public void Invoked_ForLazySutAndNullTest_ReturnsInstance(
-            Lazy<Something>         sut,
-            [BeNull] ISomethingElse _)
+        [ AutoDataTestMethod ]
+        public void Invoked_ForLazySutAndNullTest_ReturnsInstance (
+            Lazy < Something >        sut ,
+            [ BeNull ] ISomethingElse _ )
         {
-            using (new AssertionScope())
+            using ( new AssertionScope ( ) )
             {
-                sut.Should()
-                   .NotBeNull();
+                sut.Should ( )
+                   .NotBeNull ( ) ;
 
                 sut.IsValueCreated
-                   .Should()
-                   .BeFalse();
+                   .Should ( )
+                   .BeFalse ( ) ;
 
-                Action action = () =>
+                Action action = ( ) =>
                                 {
                                     // ReSharper disable once UnusedVariable
-                                    var actual = sut.Value;
-                                };
+                                    var actual = sut.Value ;
+                                } ;
 
-                action.Should()
-                      .Throw<ArgumentNullException>()
-                      .WithParameter("something");
+                action.Should ( )
+                      .Throw < ArgumentNullException > ( )
+                      .WithParameter ( "something" ) ;
             }
         }
 
-        [TestInitialize]
-        public void TestInitialize()
+        [ TestInitialize ]
+        public void TestInitialize ( )
         {
-            _testMethodAttribute = new TestMethodAttribute();
-            _testMethod          = Substitute.For<ITestMethod>();
+            _testMethodAttribute = new TestMethodAttribute ( ) ;
+            _testMethod          = Substitute.For < ITestMethod > ( ) ;
 
-            var methodInfo = GetType()
-               .GetMethod(MethodNameWithInterface,
-                          new[]
-                          {
-                              typeof(ISomething)
-                          });
+            var methodInfo = GetType ( )
+               .GetMethod ( MethodNameWithInterface ,
+                            new [ ]
+                            {
+                                typeof ( ISomething )
+                            } ) ;
 
-            if (methodInfo == null)
+            if ( methodInfo == null )
             {
-                var message = string.Format(CultureInfo.InvariantCulture,
-                                            $"Can't find method '{MethodNameWithInterface}'");
+                var message = string.Format ( CultureInfo.InvariantCulture ,
+                                              $"Can't find method '{MethodNameWithInterface}'" ) ;
 
-                throw new Exception(message);
+                throw new Exception ( message ) ;
             }
 
-            _parameterInfoString = methodInfo.GetParameters();
+            _parameterInfoString = methodInfo.GetParameters ( ) ;
         }
 
-        [ExcludeFromCodeCoverage]
-        private static bool ExpectedObjects(IReadOnlyList<object> x)
+        [ ExcludeFromCodeCoverage ]
+        private static bool ExpectedObjects ( IReadOnlyList < object > x )
         {
-            if (x.Count != 1) return false;
+            if ( x.Count != 1 ) return false ;
 
-            return x[0] is ISomething;
+            return x [ 0 ] is ISomething ;
         }
 
 
-        private AutoDataTestMethodAttribute CreateSut()
+        private AutoDataTestMethodAttribute CreateSut ( )
         {
-            return new AutoDataTestMethodAttribute();
+            return new AutoDataTestMethodAttribute ( ) ;
         }
 
-        private AutoDataTestMethodAttribute CreateSut(TestMethodAttribute attribute)
+        private AutoDataTestMethodAttribute CreateSut ( TestMethodAttribute attribute )
         {
-            return new AutoDataTestMethodAttribute(attribute);
+            return new AutoDataTestMethodAttribute ( attribute ) ;
         }
     }
 }

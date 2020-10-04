@@ -1,83 +1,83 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.Linq;
-using FluentAssertions;
-using JetBrains.Annotations;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System ;
+using System.Diagnostics.CodeAnalysis ;
+using System.Globalization ;
+using System.Linq ;
+using FluentAssertions ;
+using JetBrains.Annotations ;
+using Microsoft.VisualStudio.TestTools.UnitTesting ;
 
 namespace Selkie.AutoMocking.Tests
 {
-    [TestClass]
+    [ TestClass ]
     public class ParameterInfoTests
     {
-        private const string MethodNameWithString = "WithString";
+        private const string MethodNameWithString = "WithString" ;
 
-        private System.Reflection.ParameterInfo _parameterInfoString;
+        private System.Reflection.ParameterInfo _parameterInfoString ;
 
-        [ExcludeFromCodeCoverage]
-        [UsedImplicitly]
-        public static System.Reflection.ParameterInfo[] WithString([Freeze] string _)
+        [ ExcludeFromCodeCoverage ]
+        [ UsedImplicitly ]
+        public static System.Reflection.ParameterInfo [ ] WithString ( [ Freeze ] string _ )
         {
-            return Array.Empty<System.Reflection.ParameterInfo>();
+            return Array.Empty < System.Reflection.ParameterInfo > ( ) ;
         }
 
-        [TestMethod]
-        public void Constructor_ForParameterInfo_SetsCustomAttributes()
+        [ TestMethod ]
+        public void Constructor_ForParameterInfo_SetsCustomAttributes ( )
         {
-            CreateSut()
+            CreateSut ( )
                .CustomAttributes
-               .Count()
-               .Should()
-               .Be(1);
+               .Count ( )
+               .Should ( )
+               .Be ( 1 ) ;
         }
 
-        [TestMethod]
-        public void Constructor_ForParameterInfo_SetsParameterType()
+        [ TestMethod ]
+        public void Constructor_ForParameterInfo_SetsParameterType ( )
         {
-            CreateSut()
+            CreateSut ( )
                .ParameterType
-               .Should()
-               .Be(typeof(string));
+               .Should ( )
+               .Be ( typeof ( string ) ) ;
         }
 
-        [TestMethod]
-        public void Constructor_ForParameterInfoIsNull_Throws()
+        [ TestMethod ]
+        public void Constructor_ForParameterInfoIsNull_Throws ( )
         {
-            _parameterInfoString = null;
+            _parameterInfoString = null ;
 
-            Action action = () => CreateSut();
+            Action action = ( ) => CreateSut ( ) ;
 
-            action.Should()
-                  .Throw<ArgumentNullException>()
-                  .WithParameter("parameterInfo");
+            action.Should ( )
+                  .Throw < ArgumentNullException > ( )
+                  .WithParameter ( "parameterInfo" ) ;
         }
 
-        [TestInitialize]
-        public void TestInitialize()
+        [ TestInitialize ]
+        public void TestInitialize ( )
         {
-            var methodInfo = typeof(ParameterInfoTests).GetMethod(MethodNameWithString,
-                                                                  new[]
-                                                                  {
-                                                                      typeof(string)
-                                                                  });
+            var methodInfo = typeof ( ParameterInfoTests ).GetMethod ( MethodNameWithString ,
+                                                                       new [ ]
+                                                                       {
+                                                                           typeof ( string )
+                                                                       } ) ;
 
-            if (methodInfo == null)
+            if ( methodInfo == null )
             {
-                var message = string.Format(CultureInfo.InvariantCulture,
-                                            $"Can't find method {MethodNameWithString}");
+                var message = string.Format ( CultureInfo.InvariantCulture ,
+                                              $"Can't find method {MethodNameWithString}" ) ;
 
-                throw new Exception(message);
+                throw new Exception ( message ) ;
             }
 
-            var infos = methodInfo.GetParameters();
+            var infos = methodInfo.GetParameters ( ) ;
 
-            _parameterInfoString = infos.First();
+            _parameterInfoString = infos.First ( ) ;
         }
 
-        private ParameterInfo CreateSut()
+        private ParameterInfo CreateSut ( )
         {
-            return new ParameterInfo(_parameterInfoString);
+            return new ParameterInfo ( _parameterInfoString ) ;
         }
     }
 }

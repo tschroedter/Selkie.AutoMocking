@@ -1,5 +1,5 @@
-﻿using System;
-using Selkie.AutoMocking.Interfaces;
+﻿using System ;
+using Selkie.AutoMocking.Interfaces ;
 
 namespace Selkie.AutoMocking
 {
@@ -7,48 +7,48 @@ namespace Selkie.AutoMocking
     public class ArgumentNullExceptionFinder : IArgumentNullExceptionFinder
     {
         /// <inheritdoc />
-        public bool TryFindArgumentNullException(Exception                 exception,
-                                                 out ArgumentNullException argumentNullException,
-                                                 int                       maxDepth = 10)
+        public bool TryFindArgumentNullException ( Exception                 exception ,
+                                                   out ArgumentNullException argumentNullException ,
+                                                   int                       maxDepth = 10 )
         {
-            Guard.ArgumentNotNull(exception,
-                                  nameof(exception));
+            Guard.ArgumentNotNull ( exception ,
+                                    nameof ( exception ) ) ;
 
-            if (maxDepth <= 0)
-                throw new ArgumentException($"{maxDepth} must be > 0",
-                                            nameof(maxDepth));
+            if ( maxDepth <= 0 )
+                throw new ArgumentException ( $"{maxDepth} must be > 0" ,
+                                              nameof ( maxDepth ) ) ;
 
-            if (exception is ArgumentNullException isArgumentNullException)
+            if ( exception is ArgumentNullException isArgumentNullException )
             {
-                argumentNullException = isArgumentNullException;
+                argumentNullException = isArgumentNullException ;
 
-                return true;
+                return true ;
             }
 
-            argumentNullException = null;
+            argumentNullException = null ;
 
-            var current = exception;
-            var last    = current;
-            var count   = 0;
+            var current = exception ;
+            var last    = current ;
+            var count   = 0 ;
 
-            while (current != null &&
-                   count++ < maxDepth)
+            while ( current  != null &&
+                    count ++ < maxDepth )
             {
-                last    = current;
-                current = current.InnerException;
+                last    = current ;
+                current = current.InnerException ;
             }
 
-            if (!(last is ArgumentException argumentException) ||
-                !argumentException.Message.StartsWith("Value cannot be null."))
-                return false;
+            if ( ! ( last is ArgumentException argumentException ) ||
+                 ! argumentException.Message.StartsWith ( "Value cannot be null." ) )
+                return false ;
 
-            Console.WriteLine("Creating ArgumentNullException with "             +
-                              $"parameter name '{argumentException.ParamName}' " +
-                              $"and message '{argumentException.Message}'.");
+            Console.WriteLine ( "Creating ArgumentNullException with "             +
+                                $"parameter name '{argumentException.ParamName}' " +
+                                $"and message '{argumentException.Message}'." ) ;
 
-            argumentNullException = new ArgumentNullException(argumentException.ParamName);
+            argumentNullException = new ArgumentNullException ( argumentException.ParamName ) ;
 
-            return true;
+            return true ;
         }
     }
 }

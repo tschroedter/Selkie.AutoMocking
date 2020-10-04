@@ -1,5 +1,5 @@
-﻿using System;
-using JetBrains.Annotations;
+﻿using System ;
+using JetBrains.Annotations ;
 
 namespace Selkie.AutoMocking.Interfaces
 {
@@ -17,7 +17,7 @@ namespace Selkie.AutoMocking.Interfaces
         /// <returns>
         ///     An instance of the given type as an object.
         /// </returns>
-        object Construct([NotNull] IArgumentsGenerator generator,
-                         [NotNull] Type                type);
+        object Construct ( [ NotNull ] IArgumentsGenerator generator ,
+                           [ NotNull ] Type                type ) ;
     }
 }

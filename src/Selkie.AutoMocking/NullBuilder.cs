@@ -1,4 +1,4 @@
-﻿using AutoFixture.Kernel;
+﻿using AutoFixture.Kernel ;
 
 namespace Selkie.AutoMocking
 {
@@ -18,9 +18,9 @@ namespace Selkie.AutoMocking
         ///     The specimen supplied to the instance in the constructor.
         /// </returns>
         /// <seealso cref="FixedBuilder(object)" />
-        public object Create(object request, ISpecimenContext context)
+        public object Create ( object request , ISpecimenContext context )
         {
-            return null;
+            return null ;
         }
     }
 }
