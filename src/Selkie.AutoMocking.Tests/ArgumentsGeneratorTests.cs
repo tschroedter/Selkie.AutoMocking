@@ -457,7 +457,8 @@ namespace Selkie.AutoMocking.Tests
         {
             _fixture = new Fixture();
             _sutCreator = new SutCreator(new SutInstanceCreator(new ArgumentNullExceptionFinder()),
-                                         new SutLazyInstanceCreator(new ArgumentNullExceptionFinder()));
+                                         new SutLazyInstanceCreator(new ArgumentNullExceptionFinder(),
+                                                                    new CustomAttributeFinder()));
             _freezeAttribute = Substitute.For<ICustomAttributeData>();
             _freezeAttribute.AttributeType.Returns(typeof(FreezeAttribute));
 

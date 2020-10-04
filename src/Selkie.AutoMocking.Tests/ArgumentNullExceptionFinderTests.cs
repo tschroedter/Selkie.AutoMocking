@@ -104,7 +104,7 @@ namespace Selkie.AutoMocking.Tests
         }
 
         [TestMethod]
-        public void TryFindArgumentNullException_ForExceptionWithHiddenArgumentNullException_ReturnsFalse()
+        public void TryFindArgumentNullException_ForExceptionWithHiddenArgumentNullException_ReturnsTrue()
         {
             CreateSut().TryFindArgumentNullException(_exceptionWithNull,
                                                      out _)

@@ -10,7 +10,10 @@ namespace Selkie.AutoMocking.Interfaces
         object[] Create([NotNull] IEnumerable<IParameterInfo> parameterInfos);
 
         object CreateArgument(Type type,
+                              bool isPopulateProperties = false,
                               bool isFreeze = false,
                               bool isBeNull = false);
+
+        object CreateOtherArgument([NotNull] IParameterInfo info);
     }
 }

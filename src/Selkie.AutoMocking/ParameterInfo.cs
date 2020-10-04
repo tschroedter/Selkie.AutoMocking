@@ -8,19 +8,27 @@ namespace Selkie.AutoMocking
 {
     public class ParameterInfo : IParameterInfo
     {
-        private readonly System.Reflection.ParameterInfo _parameterInfo;
-
         public ParameterInfo([NotNull] System.Reflection.ParameterInfo parameterInfo)
         {
             Guard.ArgumentNotNull(parameterInfo,
                                   nameof(parameterInfo));
 
-            _parameterInfo = parameterInfo;
+            var parameterInfo1 = parameterInfo;
+
+            CustomAttributes = parameterInfo1.CustomAttributes.Select(x => new CustomAttributeData(x));
+            ParameterType = parameterInfo1.ParameterType;
         }
 
-        public IEnumerable<ICustomAttributeData> CustomAttributes =>
-            _parameterInfo.CustomAttributes.Select(x => new CustomAttributeData(x));
+        private ParameterInfo()
+        {
+            CustomAttributes = Array.Empty<ICustomAttributeData>();
+            ParameterType = typeof(object);
+        }
 
-        public Type ParameterType => _parameterInfo.ParameterType;
+        public IEnumerable<ICustomAttributeData> CustomAttributes { get; }
+
+        public Type ParameterType { get; }
+
+        public static ParameterInfo Empty = new ParameterInfo();
     }
 }

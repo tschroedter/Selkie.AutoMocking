@@ -18,7 +18,8 @@ namespace Selkie.AutoMocking
         public ArgumentsGenerator()
             : this(new Fixture(),
                    new SutCreator(new SutInstanceCreator(new ArgumentNullExceptionFinder()),
-                                  new SutLazyInstanceCreator(new ArgumentNullExceptionFinder())))
+                                  new SutLazyInstanceCreator(new ArgumentNullExceptionFinder(),
+                                                             new CustomAttributeFinder())))
         {
         }
 
@@ -34,9 +35,10 @@ namespace Selkie.AutoMocking
             _sutCreator = sutCreator;
 
             _fixture.Customize(new AutoNSubstituteCustomization
-                               {
-                                   ConfigureMembers = true
-                               });
+            {
+                ConfigureMembers = true,
+                GenerateDelegates = true
+            });
         }
 
         public object[] Create(IEnumerable<IParameterInfo> parameterInfos)
@@ -52,11 +54,14 @@ namespace Selkie.AutoMocking
         }
 
         public object CreateArgument([NotNull] Type type,
-                                     bool           isFreeze = false,
-                                     bool           isBeNull = false)
+                                     bool           isPopulateProperties = false,
+                                     bool           isFreeze             = false,
+                                     bool           isBeNull             = false)
         {
             Guard.ArgumentNotNull(type,
                                   nameof(type));
+
+            if (!isPopulateProperties) _fixture.Customize(new DoNotSetPropertyCustomization(type)); // todo testing
 
             if (isFreeze) _fixture.Customize(new FreezingCustomization(type));
 
@@ -74,6 +79,11 @@ namespace Selkie.AutoMocking
 
             throw new ArgumentNullException(type.FullName,
                                             message);
+        }
+
+        private static bool IsPopulateProperties(IParameterInfo info)
+        {
+            return info.CustomAttributes.Any(x => x.AttributeType == typeof(PopulateAttribute));
         }
 
         private static bool IsFreezeParameter(IParameterInfo info)
@@ -96,7 +106,17 @@ namespace Selkie.AutoMocking
             return parameters;
         }
 
-        private object[] CreateOtherArguments(IParameterInfo[] infos)
+        public object CreateOtherArgument(IParameterInfo info) // todo testing
+        {
+            Guard.ArgumentNotNull(info, nameof(info));
+
+            return CreateArgument(info.ParameterType,
+                isPopulateProperties: IsPopulateProperties(info), // toto test
+                isFreeze: IsFreezeParameter(info),
+                isBeNull: IsBeNullParameter(info));
+        }
+
+        private object[] CreateOtherArguments(IParameterInfo[] infos) // todo use CreateOtherArgument
         {
             var parameters = new object[infos.Length];
 
@@ -104,9 +124,7 @@ namespace Selkie.AutoMocking
             {
                 var info = infos[i];
 
-                parameters[i] = CreateArgument(info.ParameterType,
-                                               IsFreezeParameter(info),
-                                               IsBeNullParameter(info));
+                parameters[i] = CreateOtherArgument(info);
             }
 
             return parameters;

@@ -104,6 +104,36 @@ namespace Selkie.AutoMocking.Tests
                        .Be(_lazyClass);
         }
 
+        [TestMethod]
+        public void Construct_ForTypeClass_InstanceWithPropertySetByDependency()
+        {
+            var sut = new SutCreator(new SutInstanceCreator(new ArgumentNullExceptionFinder()),
+                new SutLazyInstanceCreator(new ArgumentNullExceptionFinder(),
+                                           new CustomAttributeFinder()));
+
+            var construct = sut.Construct(new ArgumentsGenerator(),
+                typeof(Device)) as Device;
+
+            construct?.PopulatedByDependency
+                .Should()
+                .NotBeNull();
+        }
+
+        [TestMethod]
+        public void Construct_ForTypeClass_InstanceWithPropertyNotAutoPopulated()
+        {
+            var sut = new SutCreator(new SutInstanceCreator(new ArgumentNullExceptionFinder()),
+                new SutLazyInstanceCreator(new ArgumentNullExceptionFinder(),
+                                           new CustomAttributeFinder()));
+
+            var construct = sut.Construct(new ArgumentsGenerator(),
+                typeof(Device)) as Device;
+
+            construct?.NotAutoPopulated
+                .Should()
+                .Be(Device.SomeText);
+        }
+
         private SutCreator CreateSut()
         {
             return new SutCreator(_creator,

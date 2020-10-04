@@ -101,9 +101,11 @@
     <Compile Include="ArgumentsGeneratorTests.cs" />
     <Compile Include="AutoDataTestMethodAttributeTests.cs" />
     <Compile Include="CustomAttributeDataTests.cs" />
+    <Compile Include="TestClasses\Device.cs" />
     <Compile Include="ExceptionAssertionsExtensions.cs" />
     <Compile Include="GuardTestData.cs" />
     <Compile Include="GuardTests.cs" />
+    <Compile Include="TestClasses\IDevice.cs" />
     <Compile Include="ParameterInfoTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SutCreatorTests.cs" />

@@ -13,16 +13,18 @@ namespace Selkie.AutoMocking.Tests
     {
         private const string ParameterName = "Name";
 
-        private IArgumentNullExceptionFinder _finder;
+        private IArgumentNullExceptionFinder _exceptionFinder;
         private IArgumentsGenerator          _generator;
         private Something                    _instance;
         private Type                         _typeClass;
         private Type                         _typeInt;
+        private ICustomAttributeFinder _attributeFinder;
 
         [TestInitialize]
         public void Initialize()
         {
-            _finder    = Substitute.For<IArgumentNullExceptionFinder>();
+            _exceptionFinder    = Substitute.For<IArgumentNullExceptionFinder>();
+            _attributeFinder = Substitute.For<ICustomAttributeFinder>();
             _generator = Substitute.For<IArgumentsGenerator>();
             _typeClass = typeof(Something);
             _typeInt   = typeof(int);
@@ -30,15 +32,27 @@ namespace Selkie.AutoMocking.Tests
         }
 
         [TestMethod]
-        public void Constructor_ForFinderIsNull_Throws()
+        public void Constructor_ForExceptionFinderIsNull_Throws()
         {
-            _finder = null;
+            _exceptionFinder = null;
 
             Action action = () => { CreateSut(); };
 
             action.Should()
                   .Throw<ArgumentNullException>()
-                  .WithParameter("finder");
+                  .WithParameter("exceptionFinder");
+        }
+
+        [TestMethod]
+        public void Constructor_ForAttributeFinderIsNull_Throws()
+        {
+            _attributeFinder = null;
+
+            Action action = () => { CreateSut(); };
+
+            action.Should()
+                .Throw<ArgumentNullException>()
+                .WithParameter("attributeFinder");
         }
 
         [TestMethod]
@@ -164,6 +178,36 @@ namespace Selkie.AutoMocking.Tests
                   .WithParameter(ParameterName);
         }
 
+        [TestMethod]
+        public void Construct_ForTypeClass_InstanceWithPropertySetByDependency()
+        {
+            var sut = new SutLazyInstanceCreator(new ArgumentNullExceptionFinder(),
+                                                 new CustomAttributeFinder());
+
+            var construct = sut.Construct(new ArgumentsGenerator(),
+                typeof(Lazy<Device>)) as Lazy<Device>;
+
+            construct?.Value
+                .PopulatedByDependency
+                .Should()
+                .NotBeNull();
+        }
+
+        [TestMethod]
+        public void Construct_ForTypeClass_InstanceWithPropertyNotAutoPopulated()
+        {
+            var sut = new SutLazyInstanceCreator(new ArgumentNullExceptionFinder(),
+                                                 new CustomAttributeFinder());
+
+            var construct = sut.Construct(new ArgumentsGenerator(),
+                typeof(Lazy<Device>)) as Lazy<Device>;
+
+            construct?.Value
+                .NotAutoPopulated
+                .Should()
+                .Be(Device.SomeText);
+        }
+
         private void GeneratorCreateThrows()
         {
             _generator.When(x => x.CreateArgument(_typeClass))
@@ -173,7 +217,7 @@ namespace Selkie.AutoMocking.Tests
         private void FinderReturns(bool value)
         {
             if (!value)
-                _finder.TryFindArgumentNullException(Arg.Any<Exception>(),
+                _exceptionFinder.TryFindArgumentNullException(Arg.Any<Exception>(),
                                                      out Arg.Any<ArgumentNullException>())
                        .Returns(x =>
                                 {
@@ -182,7 +226,7 @@ namespace Selkie.AutoMocking.Tests
                                     return false;
                                 });
             else
-                _finder.TryFindArgumentNullException(Arg.Any<Exception>(),
+                _exceptionFinder.TryFindArgumentNullException(Arg.Any<Exception>(),
                                                      out Arg.Any<ArgumentNullException>())
                        .Returns(x =>
                                 {
@@ -194,7 +238,8 @@ namespace Selkie.AutoMocking.Tests
 
         private SutLazyInstanceCreator CreateSut()
         {
-            return new SutLazyInstanceCreator(_finder);
+            return new SutLazyInstanceCreator(_exceptionFinder,
+                                              _attributeFinder);
         }
     }
 }

@@ -144,7 +144,7 @@ namespace Selkie.AutoMocking.Tests
         [AutoDataTestMethod]
         public void Invoked_ForLazySutAndNullTest_ReturnsInstance(
             Lazy<Something>         sut,
-            [BeNull] ISomethingElse somethingElse)
+            [BeNull] ISomethingElse _)
         {
             using (new AssertionScope())
             {

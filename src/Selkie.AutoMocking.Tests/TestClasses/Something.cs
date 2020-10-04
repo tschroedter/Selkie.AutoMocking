@@ -12,8 +12,11 @@ namespace Selkie.AutoMocking.Tests.TestClasses
                                   nameof(something));
 
             SomethingElse = something;
+            Name = "SomethingElse.Name";
         }
 
         public ISomethingElse SomethingElse { get; }
+
+        public string Name { get; set; }
     }
 }
