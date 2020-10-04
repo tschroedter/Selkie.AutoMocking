@@ -28,7 +28,5 @@ namespace Selkie.AutoMocking
         public IEnumerable<ICustomAttributeData> CustomAttributes { get; }
 
         public Type ParameterType { get; }
-
-        public static ParameterInfo Empty = new ParameterInfo();
     }
 }
