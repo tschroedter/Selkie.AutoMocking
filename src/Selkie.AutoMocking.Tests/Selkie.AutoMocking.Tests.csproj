@@ -100,7 +100,10 @@
     <Compile Include="ArgumentNullExceptionFinderTests.cs" />
     <Compile Include="ArgumentsGeneratorTests.cs" />
     <Compile Include="AutoDataTestMethodAttributeTests.cs" />
+    <Compile Include="BeNullCustomizationTests.cs" />
     <Compile Include="CustomAttributeDataTests.cs" />
+    <Compile Include="DoNotSetPropertyBuilderTests.cs" />
+    <Compile Include="DoNotSetPropertyCustomizationTests.cs" />
     <Compile Include="TestClasses\Device.cs" />
     <Compile Include="ExceptionAssertionsExtensions.cs" />
     <Compile Include="GuardTestData.cs" />

@@ -1,10 +1,10 @@
 ﻿using System ;
-using System.Diagnostics.CodeAnalysis ;
 using System.Globalization ;
 using System.Linq ;
 using System.Reflection ;
 using AutoFixture ;
 using AutoFixture.Kernel ;
+using JetBrains.Annotations ;
 
 namespace Selkie.AutoMocking
 {
@@ -12,11 +12,9 @@ namespace Selkie.AutoMocking
     ///     Customization that supports setting a registered type to be always
     ///     null when resolved.
     /// </summary>
-    [ ExcludeFromCodeCoverage ]
     public class BeNullCustomization
         : ICustomization
     {
-        // todo testing
         public BeNullCustomization ( Type targetType )
             : this ( targetType , targetType )
         {
@@ -27,10 +25,10 @@ namespace Selkie.AutoMocking
         /// </summary>
         /// <param name="targetType"></param>
         /// <param name="registeredType"></param>
-        public BeNullCustomization ( Type targetType , Type registeredType )
+        public BeNullCustomization ( [ NotNull ] Type targetType , [ NotNull ] Type registeredType )
         {
-            if ( targetType     == null ) throw new ArgumentNullException ( nameof ( targetType ) ) ;
-            if ( registeredType == null ) throw new ArgumentNullException ( nameof ( registeredType ) ) ;
+            Guard.ArgumentNotNull ( targetType ,     nameof ( targetType ) ) ;
+            Guard.ArgumentNotNull ( registeredType , nameof ( registeredType ) ) ;
 
             if ( ! registeredType.GetTypeInfo ( ).IsAssignableFrom ( targetType ) )
             {
@@ -39,7 +37,9 @@ namespace Selkie.AutoMocking
                                              "The type '{0}' cannot be set to null as '{1}' because the two types are not compatible." ,
                                              targetType ,
                                              registeredType ) ;
-                throw new ArgumentException ( message ) ;
+
+                throw new ArgumentException ( message,
+                                              nameof(registeredType) ) ;
             }
 
             TargetType     = targetType ;
@@ -63,10 +63,9 @@ namespace Selkie.AutoMocking
         /// <param name="fixture">
         ///     The <see cref="IFixture" /> to be customized.
         /// </param>
-        public void Customize ( IFixture fixture )
+        public void Customize ( [ NotNull ] IFixture fixture )
         {
-            if ( fixture == null )
-                throw new ArgumentNullException ( nameof ( fixture ) ) ;
+            Guard.ArgumentNotNull ( fixture , nameof ( fixture ) ) ;
 
             var fixedBuilder = new NullBuilder ( ) ;
 
@@ -77,8 +76,7 @@ namespace Selkie.AutoMocking
                         } ;
 
             var specimenBuilders = from t in types
-                                   select SpecimenBuilderNodeFactory.CreateTypedNode ( t ,
-                                                  fixedBuilder )
+                                   select SpecimenBuilderNodeFactory.CreateTypedNode ( t , fixedBuilder )
                                               as ISpecimenBuilder ;
 
             var builder = new CompositeSpecimenBuilder ( specimenBuilders ) ;

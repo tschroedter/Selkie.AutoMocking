@@ -1,10 +1,12 @@
 ﻿using System ;
 using System.Collections.Generic ;
 using System.Diagnostics ;
+using System.Diagnostics.CodeAnalysis ;
 
 namespace Selkie.AutoMocking
 {
-    public class CustomAttributeFinder : ICustomAttributeFinder // todo testing
+    [ExcludeFromCodeCoverage]
+    public class CustomAttributeFinder : ICustomAttributeFinder
     {
         public const int MaxStackFrameIteration = 1000 ;
 
@@ -52,7 +54,7 @@ namespace Selkie.AutoMocking
 
                     var info = new ParameterInfo ( parameterInfo ) ;
 
-                    infos.Add ( info ) ; //.CreateOtherArgument(info);
+                    infos.Add ( info ) ;
                 }
             } while ( ! hasFound &&
                       count < MaxStackFrameIteration ) ;

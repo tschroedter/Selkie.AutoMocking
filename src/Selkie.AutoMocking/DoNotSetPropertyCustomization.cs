@@ -4,22 +4,23 @@ using JetBrains.Annotations ;
 
 namespace Selkie.AutoMocking
 {
-    public class DoNotSetPropertyCustomization : ICustomization // todo testing
+    public class DoNotSetPropertyCustomization : ICustomization
     {
-        private readonly Type _type ;
-
-        public DoNotSetPropertyCustomization ( [ NotNull ] Type type )
+        public DoNotSetPropertyCustomization ( [ NotNull ] Type targetType )
         {
-            Guard.ArgumentNotNull ( type , nameof ( type ) ) ;
+            Guard.ArgumentNotNull ( targetType , nameof ( targetType ) ) ;
 
-            _type = type ;
+            TargetType = targetType ;
         }
+
+        public Type TargetType { get ; }
 
         public void Customize ( [ NotNull ] IFixture fixture )
         {
             Guard.ArgumentNotNull ( fixture , nameof ( fixture ) ) ;
 
-            fixture.Customizations.Add ( new DoNotSetProperty ( _type ) ) ;
+            fixture.Customizations
+                   .Add ( new DoNotSetPropertyBuilder ( TargetType ) ) ;
         }
     }
 }
