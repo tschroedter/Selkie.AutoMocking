@@ -23,7 +23,7 @@ namespace Selkie.AutoMocking
         {
         }
 
-        internal ArgumentsGenerator ( [ NotNull ] IFixture    fixture ,
+        internal ArgumentsGenerator ( [ NotNull ] IFixture fixture ,
                                       [ NotNull ] ISutCreator sutCreator )
         {
             Guard.ArgumentNotNull ( fixture ,
@@ -54,9 +54,9 @@ namespace Selkie.AutoMocking
         }
 
         public object CreateArgument ( [ NotNull ] Type type ,
-                                       bool             isPopulateProperties = false ,
-                                       bool             isFreeze             = false ,
-                                       bool             isBeNull             = false )
+                                       bool isPopulateProperties = false ,
+                                       bool isFreeze = false ,
+                                       bool isBeNull = false )
         {
             Guard.ArgumentNotNull ( type ,
                                     nameof ( type ) ) ;

@@ -11,7 +11,7 @@ namespace Selkie.AutoMocking
         private readonly ISutInstanceCreator     _creator ;
         private readonly ISutLazyInstanceCreator _lazyCreator ;
 
-        public SutCreator ( [ NotNull ] ISutInstanceCreator     creator ,
+        public SutCreator ( [ NotNull ] ISutInstanceCreator creator ,
                             [ NotNull ] ISutLazyInstanceCreator lazyCreator )
         {
             Guard.ArgumentNotNull ( creator ,
@@ -24,7 +24,7 @@ namespace Selkie.AutoMocking
         }
 
         public object Construct ( IArgumentsGenerator generator ,
-                                  Type                type )
+                                  Type type )
         {
             Guard.ArgumentNotNull ( generator ,
                                     nameof ( generator ) ) ;

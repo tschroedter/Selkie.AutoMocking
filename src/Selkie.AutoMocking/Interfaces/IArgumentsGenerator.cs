@@ -11,8 +11,8 @@ namespace Selkie.AutoMocking.Interfaces
 
         object CreateArgument ( Type type ,
                                 bool isPopulateProperties = false ,
-                                bool isFreeze             = false ,
-                                bool isBeNull             = false ) ;
+                                bool isFreeze = false ,
+                                bool isBeNull = false ) ;
 
         object CreateOtherArgument ( [ NotNull ] IParameterInfo info ) ;
     }

@@ -9,7 +9,7 @@ namespace Selkie.AutoMocking.Tests
     public class GuardTests
     {
         public static void AssertException ( Action action ,
-                                             Type   type ,
+                                             Type type ,
                                              string parameter )
         {
             using ( new AssertionScope ( ) )
@@ -32,7 +32,7 @@ namespace Selkie.AutoMocking.Tests
                         typeof ( GuardTestData ) ,
                         DynamicDataSourceType.Method ) ]
         public void ArgumentNotEmptyOrWhitespace_ForInvalidValues_Throws ( string value ,
-                                                                           Type   type )
+                                                                           Type type )
         {
             AssertException ( ( ) => Guard.ArgumentNotEmptyOrWhitespace ( value ,
                                                                           "parameter" ) ,
@@ -96,7 +96,7 @@ namespace Selkie.AutoMocking.Tests
                         typeof ( GuardTestData ) ,
                         DynamicDataSourceType.Method ) ]
         public void ArgumentNotNullOrEmpty_ForValues_Throws ( string value ,
-                                                              Type   type )
+                                                              Type type )
         {
             AssertException ( ( ) => Guard.ArgumentNotNullOrEmpty ( value ,
                                                                     "parameter" ) ,

@@ -13,7 +13,7 @@ namespace Selkie.AutoMocking.Tests
         [ UsedImplicitly ]
         public static AndConstraint < StringAssertions > WithParameter (
             this ExceptionAssertions < ArgumentException > assertions ,
-            string                                         parameter )
+            string parameter )
         {
             return assertions.And
                              .ParamName
@@ -24,7 +24,7 @@ namespace Selkie.AutoMocking.Tests
         [ UsedImplicitly ]
         public static AndConstraint < StringAssertions > WithParameter (
             this ExceptionAssertions < ArgumentNullException > assertions ,
-            string                                             parameter )
+            string parameter )
         {
             return assertions.And
                              .ParamName

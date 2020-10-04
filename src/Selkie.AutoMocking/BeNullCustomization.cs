@@ -25,7 +25,8 @@ namespace Selkie.AutoMocking
         /// </summary>
         /// <param name="targetType"></param>
         /// <param name="registeredType"></param>
-        public BeNullCustomization ( [ NotNull ] Type targetType , [ NotNull ] Type registeredType )
+        public BeNullCustomization ( [ NotNull ] Type targetType ,
+                                     [ NotNull ] Type registeredType )
         {
             Guard.ArgumentNotNull ( targetType ,     nameof ( targetType ) ) ;
             Guard.ArgumentNotNull ( registeredType , nameof ( registeredType ) ) ;
@@ -38,8 +39,8 @@ namespace Selkie.AutoMocking
                                              targetType ,
                                              registeredType ) ;
 
-                throw new ArgumentException ( message,
-                                              nameof(registeredType) ) ;
+                throw new ArgumentException ( message ,
+                                              nameof ( registeredType ) ) ;
             }
 
             TargetType     = targetType ;

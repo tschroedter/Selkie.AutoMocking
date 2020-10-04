@@ -18,6 +18,6 @@ namespace Selkie.AutoMocking.Interfaces
         ///     An instance of the given type as an object.
         /// </returns>
         object Construct ( [ NotNull ] IArgumentsGenerator generator ,
-                           [ NotNull ] Type                type ) ;
+                           [ NotNull ] Type type ) ;
     }
 }

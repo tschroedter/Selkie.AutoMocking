@@ -7,9 +7,9 @@ namespace Selkie.AutoMocking
     public class ArgumentNullExceptionFinder : IArgumentNullExceptionFinder
     {
         /// <inheritdoc />
-        public bool TryFindArgumentNullException ( Exception                 exception ,
+        public bool TryFindArgumentNullException ( Exception exception ,
                                                    out ArgumentNullException argumentNullException ,
-                                                   int                       maxDepth = 10 )
+                                                   int maxDepth = 10 )
         {
             Guard.ArgumentNotNull ( exception ,
                                     nameof ( exception ) ) ;

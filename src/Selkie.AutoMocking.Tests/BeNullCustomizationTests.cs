@@ -10,13 +10,13 @@ using Selkie.AutoMocking.Tests.TestClasses ;
 
 namespace Selkie.AutoMocking.Tests
 {
-    [TestClass]
+    [ TestClass ]
     public class BeNullCustomizationTests
     {
-        private Type                      _targetType ;
-        private Type                      _registeredType ;
-        private IFixture                  _fixture ;
         private List < ISpecimenBuilder > _builders ;
+        private IFixture                  _fixture ;
+        private Type                      _registeredType ;
+        private Type                      _targetType ;
 
         [ TestInitialize ]
         public void Initialize ( )
@@ -24,109 +24,109 @@ namespace Selkie.AutoMocking.Tests
             _targetType     = typeof ( Something ) ;
             _registeredType = typeof ( ISomething ) ;
 
-            _fixture                = Substitute.For < IFixture > ( ) ;
+            _fixture = Substitute.For < IFixture > ( ) ;
 
-            _builders = new List<ISpecimenBuilder>();
+            _builders = new List < ISpecimenBuilder > ( ) ;
 
             _fixture.Customizations
-                    .Returns ( _builders );
+                    .Returns ( _builders ) ;
         }
 
-        [TestMethod]
-        public void Constructor_ForWithSingleParameterAndTargetTypeIsNull_Throws()
+        [ TestMethod ]
+        public void Constructor_ForWithSingleParameterAndTargetTypeIsNull_Throws ( )
         {
-            Action action = () => CreateSut(null);
+            Action action = ( ) => CreateSut ( null ) ;
 
-            action.Should()
-                  .Throw<ArgumentNullException>()
-                  .WithParameter("targetType");
+            action.Should ( )
+                  .Throw < ArgumentNullException > ( )
+                  .WithParameter ( "targetType" ) ;
         }
 
-        [TestMethod]
-        public void Constructor_ForTargetTypeIsNull_Throws()
+        [ TestMethod ]
+        public void Constructor_ForTargetTypeIsNull_Throws ( )
         {
-            _targetType = null;
+            _targetType = null ;
 
-            Action action = () => CreateSut();
+            Action action = ( ) => CreateSut ( ) ;
 
-            action.Should()
-                  .Throw<ArgumentNullException>()
-                  .WithParameter("targetType");
+            action.Should ( )
+                  .Throw < ArgumentNullException > ( )
+                  .WithParameter ( "targetType" ) ;
         }
 
-        [TestMethod]
-        public void Constructor_ForRegisteredTypeIsNull_Throws()
+        [ TestMethod ]
+        public void Constructor_ForRegisteredTypeIsNull_Throws ( )
         {
-            _registeredType = null;
+            _registeredType = null ;
 
-            Action action = () => CreateSut();
+            Action action = ( ) => CreateSut ( ) ;
 
-            action.Should()
-                  .Throw<ArgumentNullException>()
-                  .WithParameter("registeredType");
+            action.Should ( )
+                  .Throw < ArgumentNullException > ( )
+                  .WithParameter ( "registeredType" ) ;
         }
 
-        [TestMethod]
-        public void Constructor_ForRegisteredTypeIsNotAssignableFromTargetType_Throws()
+        [ TestMethod ]
+        public void Constructor_ForRegisteredTypeIsNotAssignableFromTargetType_Throws ( )
         {
             _registeredType = typeof ( ISomethingElse ) ;
 
-            Action action = () => CreateSut();
+            Action action = ( ) => CreateSut ( ) ;
 
-            action.Should()
-                  .Throw<ArgumentException>()
-                  .WithParameter("registeredType");
+            action.Should ( )
+                  .Throw < ArgumentException > ( )
+                  .WithParameter ( "registeredType" ) ;
         }
 
-        [TestMethod]
-        public void Constructor_ForTargetType_SetsTargetType()
+        [ TestMethod ]
+        public void Constructor_ForTargetType_SetsTargetType ( )
         {
-            CreateSut()
+            CreateSut ( )
                .TargetType
-               .Should()
-               .Be(_targetType);
+               .Should ( )
+               .Be ( _targetType ) ;
         }
 
-        [TestMethod]
-        public void Constructor_ForRegisteredType_SetsRegisteredType()
+        [ TestMethod ]
+        public void Constructor_ForRegisteredType_SetsRegisteredType ( )
         {
-            CreateSut()
+            CreateSut ( )
                .RegisteredType
-               .Should()
-               .Be(_registeredType);
+               .Should ( )
+               .Be ( _registeredType ) ;
         }
 
-        [TestMethod]
-        public void Customize_ForFixtureIsNull_Throws()
+        [ TestMethod ]
+        public void Customize_ForFixtureIsNull_Throws ( )
         {
             // ReSharper disable once AssignNullToNotNullAttribute
-            Action action = () => CreateSut().Customize ( null );
+            Action action = ( ) => CreateSut ( ).Customize ( null ) ;
 
-            action.Should()
-                  .Throw<ArgumentNullException>()
-                  .WithParameter("fixture");
+            action.Should ( )
+                  .Throw < ArgumentNullException > ( )
+                  .WithParameter ( "fixture" ) ;
         }
 
-        [TestMethod]
-        public void Customize_ForFixture_CallsCustomizations()
+        [ TestMethod ]
+        public void Customize_ForFixture_CallsCustomizations ( )
         {
-            CreateSut().Customize(_fixture);
+            CreateSut ( ).Customize ( _fixture ) ;
 
             _builders.Count
                      .Should ( )
                      .Be ( 1 ) ;
         }
 
-        private BeNullCustomization CreateSut()
+        private BeNullCustomization CreateSut ( )
         {
-            return new BeNullCustomization(_targetType,
-                                           _registeredType);
+            return new BeNullCustomization ( _targetType ,
+                                             _registeredType ) ;
         }
 
-        [UsedImplicitly]
-        private BeNullCustomization CreateSut(Type targetType)
+        [ UsedImplicitly ]
+        private BeNullCustomization CreateSut ( Type targetType )
         {
-            return new BeNullCustomization(targetType);
+            return new BeNullCustomization ( targetType ) ;
         }
     }
 }

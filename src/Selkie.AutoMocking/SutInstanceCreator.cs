@@ -18,7 +18,7 @@ namespace Selkie.AutoMocking
         }
 
         public object Construct ( IArgumentsGenerator generator ,
-                                  Type                type )
+                                  Type type )
         {
             Guard.ArgumentNotNull ( generator ,
                                     nameof ( generator ) ) ;
@@ -29,7 +29,7 @@ namespace Selkie.AutoMocking
         }
 
         private object CreateInstance ( IArgumentsGenerator generator ,
-                                        Type                type )
+                                        Type type )
         {
             try
             {

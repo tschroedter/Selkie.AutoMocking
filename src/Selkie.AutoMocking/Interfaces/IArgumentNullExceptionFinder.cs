@@ -27,8 +27,8 @@ namespace Selkie.AutoMocking.Interfaces
         /// <returns>
         ///     'true' if an <see cref="ArgumentNullException" /> was found, otherwise 'false'.
         /// </returns>
-        bool TryFindArgumentNullException ( [ NotNull ] Exception             exception ,
-                                            out         ArgumentNullException argumentNullException ,
-                                            int                               maxDepth = 10 ) ;
+        bool TryFindArgumentNullException ( [ NotNull ] Exception exception ,
+                                            out ArgumentNullException argumentNullException ,
+                                            int maxDepth = 10 ) ;
     }
 }

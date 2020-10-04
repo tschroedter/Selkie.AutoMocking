@@ -18,7 +18,7 @@ namespace Selkie.AutoMocking
         private readonly IArgumentNullExceptionFinder _exceptionFinder ;
 
         public SutLazyInstanceCreator ( [ NotNull ] IArgumentNullExceptionFinder exceptionFinder ,
-                                        [ NotNull ] ICustomAttributeFinder       attributeFinder )
+                                        [ NotNull ] ICustomAttributeFinder attributeFinder )
         {
             Guard.ArgumentNotNull ( exceptionFinder ,
                                     nameof ( exceptionFinder ) ) ;
@@ -30,7 +30,7 @@ namespace Selkie.AutoMocking
         }
 
         public object Construct ( IArgumentsGenerator generator ,
-                                  Type                type )
+                                  Type type )
         {
             Guard.ArgumentNotNull ( generator ,
                                     nameof ( generator ) ) ;
@@ -42,7 +42,7 @@ namespace Selkie.AutoMocking
         }
 
         private object CreateInstance ( IArgumentsGenerator generator ,
-                                        Type                type )
+                                        Type type )
         {
             var methodCall = Expression.Call ( Expression.Constant ( this ) ,
                                                FactoryMethod ,
@@ -63,7 +63,7 @@ namespace Selkie.AutoMocking
         }
 
         private object Factory ( IArgumentsGenerator generator ,
-                                 Type                type )
+                                 Type type )
         {
             try
             {
@@ -115,7 +115,8 @@ namespace Selkie.AutoMocking
         ///     The type of the service under test to be created.
         /// </param>
         /// <returns></returns>
-        private static object CreateSut ( IArgumentsGenerator generator , Type type )
+        private static object CreateSut ( IArgumentsGenerator generator ,
+                                          Type type )
         {
             return generator.CreateArgument ( type ) ;
         }

@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis ;
 
 namespace Selkie.AutoMocking
 {
-    [ExcludeFromCodeCoverage]
+    [ ExcludeFromCodeCoverage ]
     public class CustomAttributeFinder : ICustomAttributeFinder
     {
         public const int MaxStackFrameIteration = 1000 ;
