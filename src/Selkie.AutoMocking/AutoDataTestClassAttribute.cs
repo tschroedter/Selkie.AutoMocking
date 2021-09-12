@@ -2,7 +2,7 @@
 
 namespace Selkie.AutoMocking
 {
-    public class AutoDataTestClassAttribute
+    public sealed class AutoDataTestClassAttribute
         : TestClassAttribute
     {
         public override TestMethodAttribute GetTestMethodAttribute ( TestMethodAttribute testMethodAttribute )

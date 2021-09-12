@@ -3,7 +3,7 @@
 namespace Selkie.AutoMocking
 {
     [ AttributeUsage ( AttributeTargets.Parameter ) ]
-    public class BeNullAttribute : Attribute
+    public sealed class BeNullAttribute : Attribute
     {
     }
 }

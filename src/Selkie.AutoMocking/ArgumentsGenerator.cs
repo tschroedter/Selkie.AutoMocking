@@ -7,6 +7,8 @@ using AutoFixture.AutoNSubstitute ;
 using AutoFixture.Kernel ;
 using JetBrains.Annotations ;
 using Selkie.AutoMocking.Interfaces ;
+using System.Runtime.CompilerServices;
+[assembly: InternalsVisibleTo("Selkie.AutoMocking.Net5.Tests")]
 
 namespace Selkie.AutoMocking
 {

@@ -4,11 +4,12 @@ using JetBrains.Annotations ;
 using Microsoft.VisualStudio.TestTools.UnitTesting ;
 using Selkie.AutoMocking.Interfaces ;
 
+
 namespace Selkie.AutoMocking
 {
-    public class AutoDataTestMethodAttribute : TestMethodAttribute
+    public sealed class AutoDataTestMethodAttribute : TestMethodAttribute
     {
-        [ CanBeNull ] internal readonly TestMethodAttribute TestMethodAttribute ;
+        [ CanBeNull ] public TestMethodAttribute TestMethodAttribute { get ; }
 
         public AutoDataTestMethodAttribute ( )
         {
