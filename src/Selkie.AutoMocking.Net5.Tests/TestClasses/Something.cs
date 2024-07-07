@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis ;
 using NotNull = JetBrains.Annotations.NotNullAttribute ;
 
-namespace Selkie.AutoMocking.Net5.Tests.TestClasses
+namespace Selkie.AutoMocking.Net8.Tests.TestClasses
 {
     [ ExcludeFromCodeCoverage ]
     public class Something : ISomething

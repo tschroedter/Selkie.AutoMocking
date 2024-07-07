@@ -2,7 +2,7 @@
 
 // ReSharper disable UnusedMember.Global
 
-namespace Selkie.AutoMocking.Net5.Tests.TestClasses
+namespace Selkie.AutoMocking.Net8.Tests.TestClasses
 {
     [ ExcludeFromCodeCoverage ]
     public class SomethingElse : ISomethingElse

@@ -7,9 +7,9 @@ using FluentAssertions.Execution ;
 using JetBrains.Annotations ;
 using Microsoft.VisualStudio.TestTools.UnitTesting ;
 using NSubstitute ;
-using Selkie.AutoMocking.Net5.Tests.TestClasses ;
+using Selkie.AutoMocking.Net8.Tests.TestClasses ;
 
-namespace Selkie.AutoMocking.Net5.Tests
+namespace Selkie.AutoMocking.Net8.Tests
 {
     [ AutoDataTestClass ]
     public class AutoDataTestMethodAttributeTests

@@ -1,4 +1,4 @@
-﻿namespace Selkie.AutoMocking.Net5.Tests.TestClasses
+﻿namespace Selkie.AutoMocking.Net8.Tests.TestClasses
 {
     public interface IDevice
     {

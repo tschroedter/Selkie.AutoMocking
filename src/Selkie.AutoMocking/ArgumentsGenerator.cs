@@ -8,6 +8,7 @@ using AutoFixture.Kernel ;
 using JetBrains.Annotations ;
 using Selkie.AutoMocking.Interfaces ;
 using System.Runtime.CompilerServices;
+
 [assembly: InternalsVisibleTo("Selkie.AutoMocking.Net5.Tests")]
 
 namespace Selkie.AutoMocking
@@ -25,8 +26,8 @@ namespace Selkie.AutoMocking
         {
         }
 
-        internal ArgumentsGenerator ( [ NotNull ] IFixture fixture ,
-                                      [ NotNull ] ISutCreator sutCreator )
+        public ArgumentsGenerator ( [ NotNull ] IFixture fixture ,
+                                    [ NotNull ] ISutCreator sutCreator )
         {
             Guard.ArgumentNotNull ( fixture ,
                                     nameof ( fixture ) ) ;

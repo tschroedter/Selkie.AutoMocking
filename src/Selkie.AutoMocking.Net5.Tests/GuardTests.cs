@@ -3,7 +3,7 @@ using FluentAssertions ;
 using FluentAssertions.Execution ;
 using Microsoft.VisualStudio.TestTools.UnitTesting ;
 
-namespace Selkie.AutoMocking.Net5.Tests
+namespace Selkie.AutoMocking.Net8.Tests
 {
     [ TestClass ]
     public class GuardTests

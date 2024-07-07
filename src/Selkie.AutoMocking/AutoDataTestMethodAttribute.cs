@@ -23,7 +23,8 @@ namespace Selkie.AutoMocking
             TestMethodAttribute = testMethodAttribute ;
         }
 
-        [ NotNull ] internal IArgumentsGenerator Generator { get ; } = new ArgumentsGenerator ( ) ;
+        [ NotNull ]
+        public IArgumentsGenerator Generator { get ; } = new ArgumentsGenerator ( ) ;
 
         public override TestResult [ ] Execute ( [ NotNull ] ITestMethod testMethod )
         {

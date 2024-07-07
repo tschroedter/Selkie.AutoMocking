@@ -1,7 +1,7 @@
 ﻿using System ;
 using System.Collections.Generic ;
 
-namespace Selkie.AutoMocking.Net5.Tests
+namespace Selkie.AutoMocking.Net8.Tests
 {
     public static class GuardTestData
     {

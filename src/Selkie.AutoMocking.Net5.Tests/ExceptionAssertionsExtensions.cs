@@ -5,7 +5,7 @@ using FluentAssertions.Primitives ;
 using FluentAssertions.Specialized ;
 using JetBrains.Annotations ;
 
-namespace Selkie.AutoMocking.Net5.Tests
+namespace Selkie.AutoMocking.Net8.Tests
 {
     [ ExcludeFromCodeCoverage ]
     public static class ExceptionAssertionsExtensions
