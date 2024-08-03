@@ -8,7 +8,7 @@
     <PackageTags>MSTest MSTest2 Extension AutoFixture NSubstitute AutoMocking</PackageTags>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <EnableNETAnalyzers>false</EnableNETAnalyzers>
-    <Version>0.0.34</Version> <!-- Update this to the correct version -->
+    <Version>0.0.36</Version> <!-- Update this to the correct version -->
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AutoFixture.AutoNSubstitute" Version="4.18.1" />
