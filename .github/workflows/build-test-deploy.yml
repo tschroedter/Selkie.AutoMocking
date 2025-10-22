@@ -1,0 +1,120 @@
+name: Build, Test and Deploy
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  SOLUTION_PATH: './src/Selkie.AutoMocking.sln'
+  PROJECT_PATH: './src/Selkie.AutoMocking/Selkie.AutoMocking.csproj'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch all history for versioning
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    
+    - name: Calculate version
+      id: version
+      run: |
+        # Get the build number from GitHub run number
+        BUILD_NUMBER=${{ github.run_number }}
+        
+        # Check if this is a tag push
+        if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+          # Extract version from tag (e.g., v0.1.5 -> 0.1.5)
+          VERSION="${GITHUB_REF#refs/tags/v}"
+        else
+          # Use v0.1.x format where x is the build number
+          VERSION="0.1.${BUILD_NUMBER}"
+        fi
+        
+        echo "version=${VERSION}" >> $GITHUB_OUTPUT
+        echo "Version: ${VERSION}"
+    
+    - name: Update version in project file
+      run: |
+        VERSION="${{ steps.version.outputs.version }}"
+        echo "Updating version to ${VERSION}"
+        
+        # Update the Version element in the .csproj file
+        sed -i "s/<Version>.*<\/Version>/<Version>${VERSION}<\/Version>/" ${{ env.PROJECT_PATH }}
+        
+        # Show the updated version line
+        grep -n "Version" ${{ env.PROJECT_PATH }}
+    
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.SOLUTION_PATH }}
+    
+    - name: Build
+      run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
+    
+    - name: Test
+      run: dotnet test ${{ env.SOLUTION_PATH }} --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
+    
+    - name: Publish test results
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: Test Results
+        path: '**/test-results.trx'
+        reporter: dotnet-trx
+        fail-on-error: true
+    
+    - name: Pack NuGet package
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))
+      run: |
+        dotnet pack ${{ env.PROJECT_PATH }} \
+          --configuration Release \
+          --no-build \
+          --output ./artifacts \
+          /p:Version=${{ steps.version.outputs.version }}
+    
+    - name: Upload NuGet package artifact
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-package
+        path: ./artifacts/*.nupkg
+        retention-days: 30
+    
+    - name: Push to NuGet.org
+      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+      env:
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+      run: |
+        if [ -z "$NUGET_API_KEY" ]; then
+          echo "⚠️  NUGET_API_KEY secret is not set. Skipping NuGet publish."
+          echo "To publish to NuGet.org, add your API key as a repository secret named NUGET_API_KEY"
+        else
+          dotnet nuget push ./artifacts/*.nupkg \
+            --api-key $NUGET_API_KEY \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+        fi
+    
+    - name: Create GitHub Release
+      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ./artifacts/*.nupkg
+        generate_release_notes: true
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
