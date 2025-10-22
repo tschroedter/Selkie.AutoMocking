@@ -1,61 +1,35 @@
-﻿using System ;
-using System.Collections.Generic ;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Selkie.AutoMocking.Net8.Tests
 {
     public static class GuardTestData
     {
-        public const string Empty      = "" ;
-        public const string Whitespace = " " ;
-
-        private const int Integer = 1 ;
-
-        private static readonly object Instance = new( ) ;
-
-
-        public static IEnumerable < object [ ] > InstanceAndInteger ( )
+        public static IEnumerable<object[]> NullEmptyOrWhitespace()
         {
-            yield return new [ ]
-                         {
-                             Instance
-                         } ;
-            yield return new object [ ]
-                         {
-                             Integer
-                         } ;
+            // For null, expect ArgumentNullException
+            yield return [null, typeof(ArgumentNullException)];
+
+            // For empty string and whitespace, expect ArgumentException
+            yield return ["", typeof(ArgumentException)];
+            yield return ["   ", typeof(ArgumentException)];
         }
 
-        public static IEnumerable < object [ ] > NullEmptyOrWhitespace ( )
+        public static IEnumerable<object[]> NullOrEmpty()
         {
-            yield return new object [ ]
-                         {
-                             null ,
-                             typeof ( ArgumentNullException )
-                         } ;
-            yield return new object [ ]
-                         {
-                             Empty ,
-                             typeof ( ArgumentException )
-                         } ;
-            yield return new object [ ]
-                         {
-                             Whitespace ,
-                             typeof ( ArgumentException )
-                         } ;
+            // For null, expect ArgumentNullException
+            yield return [null, typeof(ArgumentNullException)];
+
+            // For empty string, expect ArgumentException
+            yield return ["", typeof(ArgumentException)];
         }
 
-        public static IEnumerable < object [ ] > NullOrEmpty ( )
+        public static IEnumerable<object[]> InstanceAndInteger()
         {
-            yield return new object [ ]
-                         {
-                             null ,
-                             typeof ( ArgumentNullException )
-                         } ;
-            yield return new object [ ]
-                         {
-                             Empty ,
-                             typeof ( ArgumentException )
-                         } ;
+            // Valid cases: non-empty string, integer, and object instance.
+            yield return ["valid"];
+            yield return [1];
+            yield return [new object()];
         }
     }
 }
