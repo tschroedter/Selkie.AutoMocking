@@ -190,3 +190,6 @@ FakesAssemblies/
 *.ncrunchproject
 NuGet.Selkie.Windsor/lib/
 Selkie.Windsor.sln.DotSettings
+
+# Build artifacts
+artifacts/
