@@ -17,6 +17,10 @@ env:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # For creating releases and uploading assets
+      checks: write    # For publishing test results
+      packages: write  # For publishing packages
 
     steps:
       - name: Checkout code
