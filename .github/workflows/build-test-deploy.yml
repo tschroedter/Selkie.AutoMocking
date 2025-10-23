@@ -5,6 +5,7 @@ on:
     branches: [main, master]
     tags:
       - 'v0.1.*'  # Trigger on v0.1.x tags where x is the build number
+      - 'deploy-v0.1.*' # Also trigger on deploy-v0.1.x tags
   pull_request:
     branches: [main, master]
   workflow_dispatch:
@@ -39,10 +40,15 @@ jobs:
           # Get the build number from GitHub run number
           BUILD_NUMBER=${{ github.run_number }}
 
-          # Check if this is a tag push matching v0.1.* pattern
-          if [[ "${{ github.ref }}" == refs/tags/v0.1.* ]]; then
-            # Extract version from tag (e.g., v0.1.5 -> 0.1.5)
-            VERSION="${GITHUB_REF#refs/tags/v}"
+          # Tag reference (e.g., v0.1.5 or deploy-v0.1.5)
+          TAG_REF="${GITHUB_REF#refs/tags/}"
+
+          # If this is a release tag matching either v0.1.* or deploy-v0.1.*
+          if [[ "${GITHUB_REF}" == refs/tags/v0.1.* ]] || [[ "${GITHUB_REF}" == refs/tags/deploy-v0.1.* ]]; then
+            # Normalize tag by removing optional prefix 'deploy-' and optional leading 'v'
+            NORMALIZED_TAG="${TAG_REF#deploy-}"
+            NORMALIZED_TAG="${NORMALIZED_TAG#v}"
+            VERSION="${NORMALIZED_TAG}"
             echo "is_release_tag=true" >> $GITHUB_OUTPUT
           else
             # Use v0.1.x format where x is the build number
@@ -93,7 +99,8 @@ jobs:
           github.event_name == 'push' &&
           (github.ref == 'refs/heads/main' ||
            github.ref == 'refs/heads/master' ||
-           startsWith(github.ref, 'refs/tags/v0.1.'))
+           startsWith(github.ref, 'refs/tags/v0.1.') ||
+           startsWith(github.ref, 'refs/tags/deploy-v0.1.'))
         run: |
           dotnet pack ${{ env.PROJECT_PATH }} \
             --configuration Release \
@@ -106,7 +113,8 @@ jobs:
           github.event_name == 'push' &&
           (github.ref == 'refs/heads/main' ||
            github.ref == 'refs/heads/master' ||
-           startsWith(github.ref, 'refs/tags/v0.1.'))
+           startsWith(github.ref, 'refs/tags/v0.1.') ||
+           startsWith(github.ref, 'refs/tags/deploy-v0.1.'))
         uses: actions/upload-artifact@v4
         with:
           name: nuget-package
@@ -115,7 +123,7 @@ jobs:
 
       - name: Push to NuGet.org
         id: nuget_push
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v0.1.')
+        if: github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v0.1.') || startsWith(github.ref, 'refs/tags/deploy-v0.1.'))
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
         run: |
@@ -134,7 +142,7 @@ jobs:
       - name: Create version tag after successful NuGet publish
         if: |
           github.event_name == 'push' &&
-          startsWith(github.ref, 'refs/tags/v0.1.') &&
+          (startsWith(github.ref, 'refs/tags/v0.1.') || startsWith(github.ref, 'refs/tags/deploy-v0.1.')) &&
           steps.nuget_push.outputs.success == 'true'
         run: |
           VERSION="${{ steps.version.outputs.version }}"
@@ -155,7 +163,7 @@ jobs:
           echo "✅ Created tag ${TAG_NAME}"
 
       - name: Create GitHub Release
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v0.1.')
+        if: github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v0.1.') || startsWith(github.ref, 'refs/tags/deploy-v0.1.'))
         uses: softprops/action-gh-release@v1
         with:
           files: ./artifacts/*.nupkg
