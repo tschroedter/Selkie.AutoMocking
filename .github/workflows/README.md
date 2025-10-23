@@ -9,7 +9,7 @@ This workflow automates the build, test, and deployment process for the Selkie.A
 The workflow runs on:
 - **Push to main/master branch**: Builds, tests, and creates NuGet packages
 - **Pull Requests**: Builds and tests only (no deployment)
-- **Git Tags** (v*): Builds, tests, packages, and publishes to NuGet.org and creates GitHub releases
+- **Git Tags** (v0.1.*): Builds, tests, packages, and publishes to NuGet.org and creates GitHub releases
 - **Manual Trigger**: Can be run manually via GitHub Actions UI
 
 ### Version Numbering
@@ -38,10 +38,11 @@ This will trigger the workflow, build version `0.1.5`, and publish it to NuGet.o
 5. **Restore dependencies**: Restores NuGet packages
 6. **Build**: Compiles the solution in Release configuration
 7. **Test**: Runs all tests and generates test reports
-8. **Pack**: Creates NuGet package (on main/master push or tags only)
+8. **Pack**: Creates NuGet package (on main/master push or v0.1.* tags only)
 9. **Upload artifact**: Saves NuGet package as workflow artifact
-10. **Push to NuGet.org**: Publishes to NuGet (on tags only, requires secret)
-11. **Create GitHub Release**: Creates a release with the package (on tags only)
+10. **Push to NuGet.org**: Publishes to NuGet (on v0.1.* tags only, requires secret)
+11. **Create version tag**: Creates a `nuget-vX.Y.Z` tag after successful NuGet publish
+12. **Create GitHub Release**: Creates a release with the package (on v0.1.* tags only)
 
 ### Required Secrets
 
@@ -82,7 +83,7 @@ Built NuGet packages are available as workflow artifacts for 30 days:
 
 - **Pull Request**: Build + Test only
 - **Push to main**: Build + Test + Package (artifact only)
-- **Push tag v0.1.5**: Build + Test + Package + Publish to NuGet + GitHub Release
+- **Push tag v0.1.5**: Build + Test + Package + Publish to NuGet + Create `nuget-v0.1.5` tag + GitHub Release
 
 ### Troubleshooting
 
