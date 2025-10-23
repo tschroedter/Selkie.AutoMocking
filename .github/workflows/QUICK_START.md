@@ -45,7 +45,8 @@ This will:
 2. Build and test
 3. Create version `0.1.5`
 4. Publish to NuGet.org
-5. Create GitHub Release
+5. Create `nuget-v0.1.5` tag to mark successful deployment
+6. Create GitHub Release
 
 ## Initial Setup
 
@@ -119,7 +120,7 @@ git push origin feature/my-feature
 ```bash
 .github/workflows/create-release.sh 0.1.10
 ```
-**Result**: Builds, tests, publishes to NuGet.org, creates GitHub Release
+**Result**: Builds, tests, publishes to NuGet.org, creates `nuget-v0.1.10` tag, creates GitHub Release
 
 ## Checking Results
 
@@ -160,13 +161,15 @@ git push origin feature/my-feature
 
 ## Tips
 
-💡 **Use semantic versioning**: When you're ready for v1.0.0, create a tag `v1.0.0`
+💡 **Tag pattern**: Only tags matching `v0.1.*` will trigger NuGet deployment (e.g., `v0.1.5`, `v0.1.123`)
 
 💡 **Test before releasing**: Always test changes in a PR before merging to main
 
 💡 **Review before publishing**: Check the package artifact before creating a release tag
 
 💡 **Skip duplicate publishes**: The workflow automatically skips if version exists on NuGet.org
+
+💡 **Deployment tracking**: After successful NuGet publish, a `nuget-vX.Y.Z` tag is created for tracking
 
 ## Next Steps
 

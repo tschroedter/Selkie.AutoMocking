@@ -33,14 +33,14 @@ The workflow implements automatic versioning:
 - **Trigger**: Automatic on every push to main/master
 
 ### Manual Versioning (For Releases)
-- **Format**: `vX.Y.Z` (e.g., `v0.1.5` or `v1.0.0`)
-- **Usage**: Create and push a git tag
+- **Format**: `v0.1.Z` (e.g., `v0.1.5`, `v0.1.123`)
+- **Usage**: Create and push a git tag matching the `v0.1.*` pattern
 - **Example**: 
   ```bash
   git tag v0.1.5
   git push origin v0.1.5
   ```
-- **Result**: Builds, tests, publishes to NuGet.org, creates GitHub Release
+- **Result**: Builds, tests, publishes to NuGet.org, creates `nuget-v0.1.5` tag, creates GitHub Release
 
 ## How It Works
 
@@ -64,11 +64,12 @@ Push to main → Workflow runs → Build + Test + Package → Artifact stored
 ### On Tagged Release
 ```
 Create tag v0.1.5 → Push tag → Workflow runs → 
-Build + Test + Package → Publish to NuGet.org + GitHub Release
+Build + Test + Package → Publish to NuGet.org + Create nuget-v0.1.5 tag + GitHub Release
 ```
 - Builds and tests with specified version
 - Creates NuGet package
 - Publishes to NuGet.org (if NUGET_API_KEY is configured)
+- Creates a `nuget-vX.Y.Z` tag to mark successful deployment
 - Creates GitHub Release with package and auto-generated notes
 
 ## Version Updates in Code
@@ -134,7 +135,7 @@ The workflow runs on:
 - ✅ Push to `main` branch
 - ✅ Push to `master` branch
 - ✅ Pull requests to `main` or `master`
-- ✅ Tags matching `v*` pattern (e.g., `v0.1.5`, `v1.0.0`)
+- ✅ Tags matching `v0.1.*` pattern (e.g., `v0.1.5`, `v0.1.123`)
 - ✅ Manual trigger via GitHub Actions UI
 
 ## Features

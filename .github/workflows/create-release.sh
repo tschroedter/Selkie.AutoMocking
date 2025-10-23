@@ -20,9 +20,10 @@ else
     VERSION=$1
 fi
 
-# Validate version format (x.y.z)
-if ! [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    echo -e "${RED}Error: Invalid version format. Expected format: x.y.z (e.g., 0.1.5)${NC}"
+# Validate version format (0.1.z for v0.1.* pattern)
+if ! [[ $VERSION =~ ^0\.1\.[0-9]+$ ]]; then
+    echo -e "${RED}Error: Invalid version format. Expected format: 0.1.z (e.g., 0.1.5, 0.1.123)${NC}"
+    echo -e "${YELLOW}Note: Only v0.1.* tags trigger NuGet deployment${NC}"
     exit 1
 fi
 
@@ -48,7 +49,8 @@ echo "  2. Trigger GitHub Actions workflow"
 echo "  3. Build and test the project"
 echo "  4. Create NuGet package with version $VERSION"
 echo "  5. Publish to NuGet.org (if NUGET_API_KEY is configured)"
-echo "  6. Create GitHub Release with package"
+echo "  6. Create nuget-v$VERSION tag after successful publish"
+echo "  7. Create GitHub Release with package"
 echo ""
 echo -e "${YELLOW}Continue? (y/n)${NC}"
 read -r CONFIRM

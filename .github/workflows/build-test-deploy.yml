@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, master]
     tags:
-      - 'v*'
+      - 'v0.1.*'  # Trigger on v0.1.x tags where x is the build number
   pull_request:
     branches: [main, master]
   workflow_dispatch:
@@ -39,13 +39,15 @@ jobs:
           # Get the build number from GitHub run number
           BUILD_NUMBER=${{ github.run_number }}
 
-          # Check if this is a tag push
-          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+          # Check if this is a tag push matching v0.1.* pattern
+          if [[ "${{ github.ref }}" == refs/tags/v0.1.* ]]; then
             # Extract version from tag (e.g., v0.1.5 -> 0.1.5)
             VERSION="${GITHUB_REF#refs/tags/v}"
+            echo "is_release_tag=true" >> $GITHUB_OUTPUT
           else
             # Use v0.1.x format where x is the build number
             VERSION="0.1.${BUILD_NUMBER}"
+            echo "is_release_tag=false" >> $GITHUB_OUTPUT
           fi
 
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
@@ -91,7 +93,7 @@ jobs:
           github.event_name == 'push' &&
           (github.ref == 'refs/heads/main' ||
            github.ref == 'refs/heads/master' ||
-           startsWith(github.ref, 'refs/tags/v'))
+           startsWith(github.ref, 'refs/tags/v0.1.'))
         run: |
           dotnet pack ${{ env.PROJECT_PATH }} \
             --configuration Release \
@@ -104,7 +106,7 @@ jobs:
           github.event_name == 'push' &&
           (github.ref == 'refs/heads/main' ||
            github.ref == 'refs/heads/master' ||
-           startsWith(github.ref, 'refs/tags/v'))
+           startsWith(github.ref, 'refs/tags/v0.1.'))
         uses: actions/upload-artifact@v4
         with:
           name: nuget-package
@@ -112,22 +114,48 @@ jobs:
           retention-days: 30
 
       - name: Push to NuGet.org
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        id: nuget_push
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v0.1.')
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
         run: |
           if [ -z "$NUGET_API_KEY" ]; then
             echo "⚠️  NUGET_API_KEY secret is not set. Skipping publish."
             echo "Add your API key as NUGET_API_KEY repository secret"
+            echo "success=false" >> $GITHUB_OUTPUT
           else
             dotnet nuget push ./artifacts/*.nupkg \
               --api-key $NUGET_API_KEY \
               --source https://api.nuget.org/v3/index.json \
               --skip-duplicate
+            echo "success=true" >> $GITHUB_OUTPUT
           fi
 
+      - name: Create version tag after successful NuGet publish
+        if: |
+          github.event_name == 'push' &&
+          startsWith(github.ref, 'refs/tags/v0.1.') &&
+          steps.nuget_push.outputs.success == 'true'
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          TAG_NAME="nuget-v${VERSION}"
+          
+          echo "Creating tag ${TAG_NAME} to mark successful NuGet publication"
+          
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Create an annotated tag
+          git tag -a "${TAG_NAME}" -m "NuGet package ${VERSION} published successfully"
+          
+          # Push the tag
+          git push origin "${TAG_NAME}"
+          
+          echo "✅ Created tag ${TAG_NAME}"
+
       - name: Create GitHub Release
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v0.1.')
         uses: softprops/action-gh-release@v1
         with:
           files: ./artifacts/*.nupkg
