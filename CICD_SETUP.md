@@ -2,6 +2,10 @@
 
 This document summarizes the CI/CD workflow setup for the Selkie.AutoMocking project.
 
+## Migration from AppVeyor to GitHub Actions
+
+This repository has migrated from AppVeyor to GitHub Actions for all continuous integration and deployment operations. If you still see `continuous-integration/appveyor/pr` as a required status check in pull requests, please see [`.github/REMOVING_APPVEYOR.md`](.github/REMOVING_APPVEYOR.md) for instructions on removing it from branch protection settings.
+
 ## What Was Added
 
 ### 1. GitHub Actions Workflow

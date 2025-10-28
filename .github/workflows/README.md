@@ -1,5 +1,9 @@
 # GitHub Actions Workflows
 
+## Migration from AppVeyor
+
+This repository now uses GitHub Actions instead of AppVeyor for continuous integration. If you still see the `continuous-integration/appveyor/pr` status check blocking pull requests, see [`../.github/REMOVING_APPVEYOR.md`](../REMOVING_APPVEYOR.md) for instructions on removing it from branch protection settings.
+
 ## Build, Test and Deploy Workflow
 
 This workflow automates the build, test, and deployment process for the Selkie.AutoMocking project.
